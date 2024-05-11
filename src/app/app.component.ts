@@ -1,13 +1,64 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core'
+import { RouterModule } from '@angular/router';
+import { AuthService } from './services/auth.service'
+import { SocketService } from './services/socket.service'
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
+import { HTTP_INTERCEPTORS } from '@angular/common/http'
+import { TokenInterceptor } from './services/token.interceptor'
+import { LoginComponent } from './login/login.component';
+
+//declare var hljs: any
 
 @Component({
-  selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  imports: [
+    LoginComponent,
+    NgxSpinnerModule,
+    RouterModule
+  ],
+  providers: [
+    NgxSpinnerService,
+    AuthService,
+    SocketService,
+    {
+      provide: HTTP_INTERCEPTORS, 
+      useClass: TokenInterceptor, 
+      multi: true
+    }
+  ]
 })
-export class AppComponent {
-  title = 'obizu-client';
+export class AppComponent implements OnInit {
+  constructor(
+    private authService: AuthService, 
+    private socketService: SocketService,
+    private ngxSpinnerService: NgxSpinnerService
+  ){}
+  ngOnInit(): void {
+    this.fetchUser()
+  }
+  
+  fetchUser(): void {
+    this.ngxSpinnerService.show()
+    this.authService.fetchUser()
+      .then(success => {
+        //this.pubService.insertPub()
+        if(success) {
+          this.socketService.setupSocketConnection()
+          this.ngxSpinnerService.hide()
+        }else{
+          this.ngxSpinnerService.hide()
+        }
+      })
+      .catch(error=>{
+        this.ngxSpinnerService.hide()
+        this.authService.login()
+      })
+      .finally(()=>{
+        this.ngxSpinnerService.hide()
+        //this.ngxSpinner.hide('autenticate')
+      })
+  }
 }

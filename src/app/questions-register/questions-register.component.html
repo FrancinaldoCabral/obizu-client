@@ -1,0 +1,431 @@
+<div class="container mt-4">
+    <div class="row mb-4 pb-4">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="assets/img/logotype-paleativo.png" alt="Bootstrap" width="30" height="24">OBizu
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    </ul>
+                    <form class="d-flex" role="button">
+                        <button class="btn btn-success m-1" type="button" >
+                            <i class="bi bi-save"></i> Entrar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <div class="row mt-4 pt-4">
+        <div class="col pb-4">
+            <span *ngIf="questions.length==0" class="text-center text-muted mt-4 border fw-italic">
+                <br><br><br>
+                <div class="alert alert-secondary" role="alert">
+                    <h3>Crie questões e em seguida salve no banco de dados.</h3>
+                    <button class="btn btn-outline-primary m-1" type="button" 
+                        data-bs-toggle="modal" data-bs-target="#questionCreateModal">
+                        <i class="bi bi-pencil-square"></i> Criar questões
+                    </button>
+                </div>
+            </span>
+            <span *ngIf="questions.length>0">
+                <div class="card mb-4 animate__animated animate__fadeIn" *ngFor="let question of questions; let iQuestions=index">
+                    <div class="card-header">
+                        #{{iQuestions+1}} 
+                    </div>
+                    <div class="card-body">
+                        <span *ngIf="!edit[iQuestions]">
+                            <span class="badge rounded-pill text-bg-light m-1" 
+                                *ngFor="let tag of question.tags">
+                                {{decodificarSequenciasUnicode(tag)}}
+                            </span>
+                        </span>
+                        <span *ngIf="edit[iQuestions]" class="mb-4">
+                            <h6>Tags</h6>
+                            <form>
+                                <div class="input-group mb-4">
+                                    <input type="text" class="form-control border border-2" 
+                                    aria-label="Adicione uma tag" aria-describedby="btnTagAdd"
+                                    autosize name="tag" id="tag" #tagInput>
+                                    <button class="btn btn-primary" type="button"
+                                    (click)="questions[iQuestions].tags.push(tagInput.value); saveQuestionsInLocalStorage();"
+                                    id="btnTagAdd"><i class="bi bi-plus-circle"></i></button>                                
+                                </div>
+                            </form>
+
+                            <form *ngFor="let tag of question.tags; let iTags=index">
+                                <div class="input-group mb-1">
+                                    <input type="text" class="form-control bg-light" 
+                                    aria-label="Recipient's username" aria-describedby="btnTagRemove"
+                                    autosize name="tag" id="tag" [(ngModel)]="questions[iQuestions].tags[iTags]">
+                                    <button class="btn btn-outline-danger" type="button"
+                                    (click)="questions[iQuestions].tags.splice(iTags, 1); saveQuestionsInLocalStorage();"
+                                    id="btnTagRemove"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </form>
+                        </span>
+                        <p class="card-text fs-4 mt-3" *ngIf="!edit[iQuestions]">
+                            {{decodificarSequenciasUnicode(question.statement)}}
+                        </p>
+                        <form *ngIf="edit[iQuestions]" class="mt-4 mb-4">
+                            <h6>Enunciado</h6>
+                            <textarea class="form-control bg-light" 
+                            autosize name="statement" id="statement" 
+                            [(ngModel)]="questions[iQuestions].statement"
+                            (blur)="saveQuestionsInLocalStorage();"></textarea>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group" *ngIf="!edit[iQuestions]">
+                          <button type="button" 
+                            class="list-group-item list-group-item-action"
+                            *ngFor="let alternative of question.alternatives; let iAlternative=index"
+                            [ngClass]="{
+                                'bg-light text-success fw-bold': iAlternative==question.answer
+                            }"
+                            (click)="question.answer=iAlternative; saveQuestionsInLocalStorage();">
+                            {{decodificarSequenciasUnicode(alternative)}}
+                          </button>
+                        </div>
+                        <span *ngIf="edit[iQuestions]" class="mb-4">
+                            <h6>Alternativas</h6>
+                            <form>
+                                <div class="input-group mb-4">
+                                    <input type="text" class="form-control border border-2" 
+                                    aria-label="Adicione uma alternativa" aria-describedby="btnAlternativeAdd"
+                                    autosize name="alternative" id="alternative" #alternativeAdd>
+                                    <button class="btn btn-primary" type="button"
+                                    (click)="questions[iQuestions].alternatives.push(alternativeAdd.value)"
+                                    id="btnAlternativeAdd"><i class="bi bi-plus-circle"></i></button>                                
+                                </div>
+                            </form>
+
+                            <form *ngFor="let alternative of question.alternatives;  let iAlternative=index">
+                                <div class="input-group mb-1">
+                                    <button class="btn btn-outline-secondary fw-bold" type="button" id="btnAnswer"
+                                        [ngClass]="{'text-success':questions[iQuestions].answer==iAlternative, 'text-danger':questions[iQuestions].answer!=iAlternative}"
+                                        (click)="questions[iQuestions].answer=iAlternative; saveQuestionsInLocalStorage();">
+                                        <i class="bi bi-check-circle" *ngIf="questions[iQuestions].answer==iAlternative"></i>
+                                        <i class="bi bi-x-circle" *ngIf="questions[iQuestions].answer!=iAlternative"></i>
+                                    </button>
+                                    <input type="text" class="form-control bg-light" 
+                                    aria-label="Recipient's username" aria-describedby="btnAlternativeRemove"
+                                    autosize name="alternative" id="alternative"
+                                    [(ngModel)]="questions[iQuestions].alternatives[iAlternative]">
+                                    <button class="btn btn-outline-danger" type="button"
+                                    (click)="questions[iQuestions].alternatives.splice(iAlternative, 1); saveQuestionsInLocalStorage();"
+                                    id="btnAlternativeRemove"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </form>
+                        </span>
+                    </div>
+                    <div class="card-body mt-4">
+                        <h6>Solução comentada</h6>
+                        <p class="card-text text-success" *ngIf="!edit[iQuestions]">
+                            {{decodificarSequenciasUnicode(question.comment)}}
+                        </p>
+                        <form *ngIf="edit[iQuestions]">
+                            <textarea class="form-control bg-light" 
+                            autosize name="comment" id="comment" 
+                            (blur)="saveQuestionsInLocalStorage()"
+                            [(ngModel)]="questions[iQuestions].comment"></textarea>
+                        </form>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-outline-primary btn-sm m-1" 
+                        *ngIf="!edit[iQuestions]"
+                        (click)="edit[iQuestions]=true"><i class="bi bi-pencil-square"></i> Editar</button>
+                        <button class="btn btn-primary btn-sm m-1" 
+                        *ngIf="edit[iQuestions]"
+                        (click)="edit[iQuestions]=false; saveQuestionsInLocalStorage()">Finalizar edição</button>
+                        
+                        <button class="btn btn-danger btn-sm m-1" 
+                            (click)="removeQuestion(iQuestions)">
+                            <i class="bi bi-trash"></i> Remover
+                        </button>
+                        <button class="btn btn-success btn-sm m-1">
+                            <i class="bi bi-save"></i> Salvar 
+                        </button>
+                    </div>
+                </div>
+            </span>
+        </div>
+    </div>
+    <br><br>
+    <div class="row mt-4">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-bottom">
+            <div class="container-fluid">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                </ul>
+                <form class="d-flex" role="button">
+                    <button class="btn btn-outline-primary m-1" type="button" 
+                        data-bs-toggle="modal" data-bs-target="#questionCreateModal">
+                        <i class="bi bi-pencil-square"></i> Criar questões
+                    </button>
+                    <button class="btn btn-danger m-1" type="button" [disabled]="questions.length==0"
+                        (click)="removeAll()">
+                        <i class="bi bi-trash"></i> Remover tudo
+                    </button>
+                    <button class="btn btn-success m-1" type="button" [disabled]="questions.length==0"
+                        (click)="saveQuestionsInDB(questions)">
+                        <i class="bi bi-save"></i> Salvar tudo
+                    </button>
+                </form>
+              </div>
+            </div>
+          </nav>
+    </div>
+</div>
+<!-- Criar questões -->
+<div class="modal fade" id="questionCreateModal" tabindex="-1" 
+    aria-labelledby="questionCreateModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 me-2" id="questionCreateModalLabel">
+            Registro de questões <br>
+            <div class="btn-group me-2" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="formType"
+                    id="formType1" autocomplete="off" 
+                    [checked]="formType=='pdf'"
+                    (click)="formType='pdf'">
+                <label class="btn btn-outline-primary" for="formType1">
+                    <i class="bi bi-filetype-pdf"></i> A partir de .pdf
+                </label>
+              
+                <input type="radio" class="btn-check" name="formType"
+                    id="formType2" autocomplete="off" 
+                    [checked]="formType=='text'"
+                    (click)="formType='text'">
+                <label class="btn btn-outline-primary" for="formType2">
+                    <i class="bi bi-body-text"></i> A partir de texto puro
+                </label>
+              
+                <input type="radio" class="btn-check" name="formType"
+                    id="formType3" autocomplete="off" 
+                    [checked]="formType=='manual'"
+                    (click)="formType='manual'">
+                <label class="btn btn-outline-primary" for="formType3">
+                    <i class="bi bi-pencil"></i> Registrar manualmente
+                </label>
+            </div>
+            <button #closeBtn type="button" class="btn btn-secondary ms-1" data-bs-dismiss="modal">Sair</button>
+            <button type="button" class="btn btn-dark ms-1" *ngIf="formType=='pdf'"
+                (click)="questionsCreateWithPdf()" [disabled]="!provaFile">
+                <span *ngIf="!uploadSpinner"><i class="bi bi-filetype-pdf"></i> Criar questões com IA (pdf)</span>
+            </button>
+            <button type="button" class="btn btn-dark ms-1" *ngIf="formType=='text'"
+                [disabled]="!provaText"
+                (click)="questionsCreateWithPureText()">
+                <span *ngIf="!uploadSpinner"><i class="bi bi-body-text"></i> Criar questões com IA (texto)</span>
+            </button>
+            <button class="btn btn-dark ms-1" *ngIf="formType=='manual'"
+                (click)="addNewQuestion()">
+                <span *ngIf="!uploadSpinner"><i class="bi bi-pencil"></i> Criar questão (manual)</span>
+            </button>
+          </h1>
+        </div>
+        <div class="modal-body">
+            <span *ngIf="formType=='pdf'">
+                <form class="form">
+                    <div class="mb-2">
+                        <label for="model" class="form-label">
+                            Modelo - Do mais barato para o mais caro.
+                        </label>
+                        <select name="model" id="model"
+                        class="form-control"
+                        aria-describedby="modelHelp"
+                        (change)="onOptionChange($event)">
+                        <option *ngFor="let m of models; let i=index" 
+                            [value]="m" 
+                            [selected]="m == model">
+                            {{m}}
+                        </option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label for="codProva" class="form-label">CONCURSO</label>
+                        <input class="form-control form-control-sm" required
+                            placeholder="Ex.: CFSD, CBFN"
+                            id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
+                    </div>
+                    <div class="mb-2">
+                        <label for="provaFile" class="form-label">Prova .pdf</label>
+                        <input class="form-control form-control-sm" required
+                            id="provaFile" name="provaFile" type="file" (change)="onProvaSelected($event)">
+                    </div>
+                    <div class="mb-2">
+                        <label for="gabaritoFile" class="form-label">Gabarito .pdf</label>
+                        <input class="form-control form-control-sm" 
+                            id="gabaritoFile" name="gabaritoFile" type="file" (change)="onGabaritoSelected($event)">
+                    </div>
+                    <div class="mb-2">
+                        <label for="editalFile" class="form-label">Edital .pdf</label>
+                        <input class="form-control form-control-sm" 
+                            id="editalFile" name="editalFile" type="file" (change)="onEditalSelected($event)">
+                    </div>
+                </form>
+                <div class="alert alert-secondary mt-4" role="alert">
+                    <h6>
+                        Custos com IA
+                    </h6>
+                    <p>
+                        ${{credits}} Custo da última geração neste dispositivo.
+                    </p>
+                    <p>
+                        ${{totalCredits}} Custo total das gerações atuais neste dispositivo.
+                    </p>
+                    <button class="btn btn-light btn-sm" (click)="resetCredits()">Reset</button>
+                </div>
+            </span>
+            <span *ngIf="formType=='text'">
+                <form #formTypeText="ngForm" (blur)="saveFormQuestionByText()">
+                    <div class="mb-2">
+                        <label for="model" class="form-label">
+                            Modelo - Do mais barato para o mais caro.
+                        </label>
+                        <select name="model" id="model"
+                        class="form-control"
+                        aria-describedby="modelHelp"
+                        (change)="onOptionChange($event)">
+                        <option *ngFor="let m of models; let i=index" 
+                            [value]="m" 
+                            [selected]="m == model">
+                            {{m}}
+                        </option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label for="codProva" class="form-label">CONCURSO</label>
+                        <input class="form-control form-control-sm" required
+                            placeholder="Ex.: CFSD, CBFN"
+                            id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
+                    </div>
+                    <div class="mb-2">
+                        <label for="provaText" class="form-label">Prova ou questões da prova</label>
+                        <textarea autosize class="form-control form-control-lg" rows="3" maxlength="20000" required
+                            id="provaText" name="provaText" [(ngModel)]="provaText"></textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label for="gabaritoText" class="form-label">Gabarito</label>
+                        <textarea class="form-control form-control-lg" rows="3" maxlength="20000" 
+                            id="gabaritoText" name="gabaritoText" [(ngModel)]="gabaritoText"></textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label for="editalText" class="form-label">Edital</label>
+                        <textarea class="form-control form-control-lg" rows="3" maxlength="20000" 
+                            id="editalText" name="editalText" [(ngModel)]="editalText"></textarea>
+                    </div>
+                </form>
+                <div class="alert alert-secondary mt-4" role="alert">
+                    <h6>
+                        Custos com IA
+                    </h6>
+                    <p>
+                        ${{credits}} Custo da última geração neste dispositivo.
+                    </p>
+                    <p>
+                        ${{totalCredits}} Custo total das gerações atuais neste dispositivo.
+                    </p>
+                    <button class="btn btn-light btn-sm" (click)="resetCredits()">Reset</button>
+                </div>
+            </span>
+            <span *ngIf="formType=='manual'">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Nova questão 
+                    </div>
+                    <div class="card-body">
+                        <span class="mb-4">
+                            <h6>Tags</h6>
+                            <form>
+                                <div class="input-group mb-4">
+                                    <input type="text" class="form-control border border-2" 
+                                    aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
+                                    autosize name="tag" id="tag" #tagInput>
+                                    <button class="btn btn-primary" type="button"
+                                    (click)="newQuestion.tags.push(tagInput.value)"
+                                    id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
+                                </div>
+                            </form>
+
+                            <form *ngFor="let tag of newQuestion.tags; let iTags=index">
+                                <div class="input-group mb-1">
+                                    <input type="text" class="form-control bg-light" 
+                                    aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
+                                    autosize name="tag" id="tag" [ngModel]="newQuestion.tags[iTags]">
+                                    <button class="btn btn-outline-danger" type="button"
+                                    (click)="newQuestion.tags.splice(iTags, 1)"
+                                    id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </form>
+                        </span>
+<!--                         <form class="mt-4 mb-4">
+                            <h6>Enunciado</h6>
+                            <textarea class="form-control bg-light" 
+                            autosize name="statement" id="statement" 
+                            [(ngModel)]="newQuestion.statement"></textarea>
+                        </form> -->
+                        <div id="editor"></div>
+                    </div>
+                    <div class="card-body">
+                        <span class="mb-4">
+                            <h6>Alternativas</h6>
+                            <form>
+                                <div class="input-group mb-4">
+                                    <input type="text" class="form-control border border-2" 
+                                    aria-label="Adicione uma alternativa" aria-describedby="btnAlternativeAddNew"
+                                    autosize name="alternative" id="alternative" #alternativeAdd>
+                                    <button class="btn btn-primary" type="button"
+                                    (click)="newQuestion.alternatives.push(alternativeAdd.value)"
+                                    id="btnAlternativeAddNew"><i class="bi bi-plus-circle"></i></button>                                
+                                </div>
+                            </form>
+                            <form *ngFor="let alternative of newQuestion.alternatives;  let iAlternative=index">
+                                <div class="input-group mb-1">
+                                    <button class="btn btn-outline-secondary fw-bold" type="button" id="btnAnswer"
+                                        [ngClass]="{'text-success':newQuestion.answer==iAlternative, 'text-danger':newQuestion.answer!=iAlternative}"
+                                        (click)="newQuestion.answer=iAlternative">
+                                        <i class="bi bi-check-circle" *ngIf="newQuestion.answer==iAlternative"></i>
+                                        <i class="bi bi-x-circle" *ngIf="newQuestion.answer!=iAlternative"></i>
+                                    </button>
+                                    <input type="text" class="form-control bg-light" 
+                                    aria-label="Recipient's username" aria-describedby="btnAlternativeRemoveNew"
+                                    autosize name="alternative" id="alternative" [(ngModel)]="newQuestion.alternatives[iAlternative]">
+                                    <button class="btn btn-outline-danger" type="button"
+                                    (click)="newQuestion.alternatives.splice(iAlternative, 1)"
+                                    id="btnAlternativeRemoveNew"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </form>
+                        </span>
+                    </div>
+                    <div class="card-body mt-4">
+                        <h6>Solução comentada</h6>
+                        <form>
+                            <textarea class="form-control bg-light" 
+                            autosize name="comment" id="comment" 
+                            [(ngModel)]="newQuestion.comment"></textarea>
+                        </form>
+                    </div>
+                    <div class="card-footer text-end">                      
+                        <button class="btn btn-danger btn-sm m-1" 
+                            (click)="clearNewQuestion()">
+                            <i class="bi bi-trash"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+            </span>
+        </div>
+      </div>
+    </div>
+</div>

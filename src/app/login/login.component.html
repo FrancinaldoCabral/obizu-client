@@ -1,0 +1,27 @@
+        <!-- Button trigger modal -->
+        <button type="button" 
+        id="login_button"
+        class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Login</h1>
+                        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                    </div>
+                    <div class="modal-body">
+                        You are disconnected.
+                        <form>
+                            <div class="form-group mt-3">
+                                <button type="button" 
+                                (click)="login()"
+                                class="btn btn-primary form-control">Connect now</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
