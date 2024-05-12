@@ -314,4 +314,21 @@ export class QuestionsRegisterComponent {
       }
     )
   }
+  saveOneQuestionInDB(question: any): void {
+    this.ngxSpinner.show()
+    this.questionService.saveQuestionsInDB([question]).subscribe(
+      (response) => {
+        console.log(response)
+        this.toastrService.success(`1 questão adicionada no DB`)
+      },
+      (error) => {
+        console.log('save in db error', error)
+        this.toastrService.error('Erro no registro de questões.')
+        this.ngxSpinner.hide()
+      },
+      () => {
+        this.ngxSpinner.hide()
+      }
+    )
+  }
 }

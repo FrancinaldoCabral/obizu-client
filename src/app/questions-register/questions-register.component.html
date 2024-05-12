@@ -43,14 +43,32 @@
     <br>
     <div class="row mt-4 pt-4 align-items-center">
         <div class="col pb-4">
-            <span *ngIf="questions.length==0" class="text-center text-muted mt-4 border fw-italic">
+            <span *ngIf="questions.length==0" class="text-center text-muted mt-4 fw-italic">
                 <br><br><br>
                 <div class="alert alert-light" role="alert">
                     <p><em>Crie questões e em seguida salve no banco de dados.</em></p>
-                    <button class="btn btn-outline-primary m-1" type="button" 
-                        data-bs-toggle="modal" data-bs-target="#questionCreateModal">
-                        <i class="bi bi-pencil-square"></i> Criar questões
-                    </button>
+                    <div class="btn-group dropup">
+                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-robot"></i> Criar com IA
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#createFromPdfModal">
+                                    <i class="bi bi-filetype-pdf"></i> A partir de .pdf
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#createFromTextModal">
+                                    <i class="bi bi-body-text"></i> A partir de texto puro
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#newQuestionModal">
+                                    <i class="bi bi-pencil"></i> Criar questão (manual)
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </span>
             <span *ngIf="questions.length>0">
@@ -89,7 +107,6 @@
                                 </div>
                             </form>
                         </span>
-
 
                         <!-- QUESTION STATEMENT -->
                         <span [innerHTML]="question.statement"></span>
@@ -186,7 +203,7 @@
                             (click)="removeQuestion(iQuestions)">
                             <i class="bi bi-trash"></i> Remover
                         </button>
-                        <button class="btn btn-success btn-sm m-1">
+                        <button class="btn btn-success btn-sm m-1" (click)="saveOneQuestionInDB(question)">
                             <i class="bi bi-save"></i> Salvar 
                         </button>
                     </div>
@@ -197,12 +214,29 @@
     <br><br>
     <div class="row mt-4">
         <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-bottom justify-content-center">
-            
-            <form class="d-flex" role="button">
-                <button class="btn btn-outline-primary m-1" type="button" 
-                    data-bs-toggle="modal" data-bs-target="#questionCreateModal">
-                    <i class="bi bi-pencil-square"></i> Criar questões
+            <div class="btn-group dropup">
+                <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-robot"></i> Criar com IA
                 </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#createFromPdfModal">
+                            <i class="bi bi-filetype-pdf"></i> A partir de .pdf
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#createFromTextModal">
+                            <i class="bi bi-body-text"></i> A partir de texto puro
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#newQuestionModal">
+                            <i class="bi bi-pencil"></i> Criar questão (manual)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <form class="d-flex" role="button">
                 <button class="btn btn-danger m-1" type="button" [disabled]="questions.length==0"
                     (click)="removeAll()">
                     <i class="bi bi-trash"></i> Remover tudo
@@ -212,61 +246,23 @@
                     <i class="bi bi-save"></i> Salvar tudo
                 </button>
             </form>
-          </nav>
+        </nav>
     </div>
 </div>
 
 
-<!-- Criar questões com IA -->
-<div class="modal fade" id="questionCreateModal" tabindex="-1" 
-    aria-labelledby="questionCreateModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
+<!-- Criar questões a partir do pdf -->
+<div class="modal fade" id="createFromPdfModal" tabindex="-1" 
+    aria-labelledby="createFromPdfModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5 me-2" id="questionCreateModalLabel">
-            Registro de questões <br>
-            <div class="btn-group me-4" role="group" aria-label="Basic radio toggle button group">
-                <input type="radio" class="btn-check" name="formType"
-                    id="formType1" autocomplete="off" 
-                    [checked]="formType=='pdf'"
-                    (click)="formType='pdf'">
-                <label class="btn btn-outline-primary" for="formType1">
-                    <i class="bi bi-filetype-pdf"></i> A partir de .pdf
-                </label>
-              
-                <input type="radio" class="btn-check" name="formType"
-                    id="formType2" autocomplete="off" 
-                    [checked]="formType=='text'"
-                    (click)="formType='text'">
-                <label class="btn btn-outline-primary" for="formType2">
-                    <i class="bi bi-body-text"></i> A partir de texto puro
-                </label>
-              
-                <input type="radio" class="btn-check" name="formType"
-                    id="formType3" autocomplete="off" (click)="clearNewQuestion()"
-                    data-bs-toggle="modal" data-bs-target="#newQuestionModal">
-                <label class="btn btn-outline-primary" for="formType3">
-                    <i class="bi bi-pencil"></i> Registrar manualmente
-                </label>
-            </div>
-            <button #closeBtn type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
-            <button type="button" class="btn btn-dark ms-1" *ngIf="formType=='pdf'"
-                (click)="questionsCreateWithPdf()" [disabled]="!provaFile">
-                <span *ngIf="!uploadSpinner"><i class="bi bi-filetype-pdf"></i> Criar questões com IA (pdf)</span>
-            </button>
-            <button type="button" class="btn btn-dark ms-1" *ngIf="formType=='text'"
-                [disabled]="!provaText"
-                (click)="questionsCreateWithPureText()">
-                <span *ngIf="!uploadSpinner"><i class="bi bi-body-text"></i> Criar questões com IA (texto)</span>
-            </button>
-            <button class="btn btn-dark ms-1" *ngIf="formType=='manual'"
-                (click)="addNewQuestion()">
-                <span *ngIf="!uploadSpinner"><i class="bi bi-pencil"></i> Criar questão (manual)</span>
-            </button>
+          <h1 class="modal-title fs-5 me-2" id="createFromPdfModalLabel">
+            <i class="bi bi-filetype-pdf"></i> A partir de .pdf
           </h1>
         </div>
         <div class="modal-body">
-            <span *ngIf="formType=='pdf'">
+            <span>
                 <form class="form">
                     <div class="mb-2">
                         <label for="model" class="form-label">
@@ -318,7 +314,30 @@
                     <button class="btn btn-light btn-sm" (click)="resetCredits()">Reset</button>
                 </div>
             </span>
-            <span *ngIf="formType=='text'">
+        </div>
+        <div class="card-footer text-center pt-2">
+            <button #closeBtn type="button" class="btn btn-outline-dark mb-2" data-bs-dismiss="modal">Sair</button>
+            <button type="button" class="btn btn-dark mb-2 ms-1"
+                (click)="questionsCreateWithPdf()" [disabled]="!provaFile">
+                <span *ngIf="!uploadSpinner"><i class="bi bi-filetype-pdf"></i> Criar questões com IA (pdf)</span>
+            </button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Criar questões a partir do texto -->
+<div class="modal fade" id="createFromTextModal" tabindex="-1" 
+    aria-labelledby="createFromTextModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 me-2" id="createFromTextModalLabel">
+            <i class="bi bi-body-text"></i> A partir de texto puro
+          </h1>
+        </div>
+        <div class="modal-body">
+            <span>
                 <form #formTypeText="ngForm" (blur)="saveFormQuestionByText()">
                     <div class="mb-2">
                         <label for="model" class="form-label">
@@ -370,6 +389,14 @@
                     <button class="btn btn-light btn-sm" (click)="resetCredits()">Reset</button>
                 </div>
             </span>
+        </div>
+        <div class="card-footer text-center pt-2">
+            <button #closeBtn type="button" class="btn btn-outline-dark mb-2" data-bs-dismiss="modal">Sair</button>
+            <button type="button" class="btn btn-dark mb-2 ms-1"
+                [disabled]="!provaText"
+                (click)="questionsCreateWithPureText()">
+                <span *ngIf="!uploadSpinner"><i class="bi bi-body-text"></i> Criar questões com IA (texto)</span>
+            </button>
         </div>
       </div>
     </div>
@@ -605,9 +632,9 @@
                 </form>
             </span>
         </div>
-        <div class="card-footer text-end pb-2">
-            <button class="btn btn-light btn-sm m-1" type="button" data-bs-dismiss="modal">Sair</button>
-            <button class="btn btn-primary btn-sm m-1" 
+        <div class="card-footer text-center pt-2">
+            <button class="btn btn-outline-dark mb-2" type="button" data-bs-dismiss="modal">Sair</button>
+            <button class="btn btn-dark mb-2 ms-1" 
             (click)="questions.push(newQuestion); saveQuestionsInLocalStorage();"
             type="button" data-bs-dismiss="modal">Adicionar</button>
         </div>
