@@ -1,21 +1,36 @@
-import { ApplicationConfig, importProvidersFrom, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { ApplicationConfig, importProvidersFrom } from '@angular/core'
 import { provideRouter } from '@angular/router'
 
 import { routes } from './app.routes'
-import { AuthService } from './services/auth.service'
-import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http'
-import { TokenInterceptor } from './services/token.interceptor'
-import { SocketService } from './services/socket.service'
-import { ChatService } from './services/chat.service'
-import { LanguageService } from './services/language.service'
-import { ToastrModule, ToastrService, provideToastr } from 'ngx-toastr'
-import { CreateQuestionsService } from './services/create-questions.service'
-import { ModelService } from './services/llm.service'
-import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
-import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations'
+import { HttpClientModule } from '@angular/common/http'
+import { provideToastr } from 'ngx-toastr'
+import { NgxSpinnerModule } from 'ngx-spinner'
+import { provideAnimations } from '@angular/platform-browser/animations'
 import { FormsModule } from '@angular/forms'
 import { CommonModule } from '@angular/common'
-import { NgxLoadingModule } from 'ngx-loading'
+import {  provideQuillConfig } from 'ngx-quill'
+
+const toolbar = [
+  ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+  ['blockquote'],
+
+  //[{ 'header': 1 }, { 'header': 2 }],               // custom button values
+  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+ // [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+  [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+  [{ 'direction': 'rtl' }],                         // text direction
+
+//  [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+  [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+  [{ 'font': [] }],
+  [{ 'align': [] }],
+
+  ['clean'],                                         // remove formatting button
+
+  ['link', 'image', 'video']                         // link and image, video
+]
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,6 +40,12 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideToastr(),
     importProvidersFrom(NgxSpinnerModule),
+    provideQuillConfig({
+      modules: {
+        //syntax: true,
+        toolbar: toolbar
+      }
+    }),
     provideRouter(routes)
   ]
 }

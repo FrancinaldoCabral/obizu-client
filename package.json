@@ -20,7 +20,7 @@
     "@angular/router": "^17.3.0",
     "bootstrap": "^5.3.3",
     "ngx-autosize": "^2.0.4",
-    "ngx-loading": "^2.0.1",
+    "ngx-quill": "^25.3.2",
     "ngx-spinner": "^16.0.2",
     "ngx-toastr": "^18.0.0",
     "quill": "^2.0.1",

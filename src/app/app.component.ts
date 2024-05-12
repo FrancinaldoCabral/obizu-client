@@ -6,6 +6,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
 import { HTTP_INTERCEPTORS } from '@angular/common/http'
 import { TokenInterceptor } from './services/token.interceptor'
 import { LoginComponent } from './login/login.component';
+import { QuestionService } from './services/question.service';
 
 //declare var hljs: any
 
@@ -23,6 +24,7 @@ import { LoginComponent } from './login/login.component';
     NgxSpinnerService,
     AuthService,
     SocketService,
+    QuestionService,
     {
       provide: HTTP_INTERCEPTORS, 
       useClass: TokenInterceptor, 

@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
-import { QuestionService } from '../services/question.service';
-import { FormsModule } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { SocketService } from '../services/socket.service';
-import { NgxSpinnerService } from 'ngx-spinner';
-import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { Component } from '@angular/core'
+import { QuestionService } from '../services/question.service'
+import { FormsModule } from '@angular/forms'
+import { ToastrService } from 'ngx-toastr'
+import { SocketService } from '../services/socket.service'
+import { NgxSpinnerService } from 'ngx-spinner'
+import { CommonModule } from '@angular/common'
+import { HttpClientModule } from '@angular/common/http'
+import { QuillModule } from 'ngx-quill'
 
 @Component({
   selector: 'app-questions-register',
@@ -13,7 +14,8 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     CommonModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    QuillModule
   ],
   providers: [
     SocketService,
@@ -55,20 +57,26 @@ export class QuestionsRegisterComponent {
     comment: ''
   }
 
-  quill:any
+  newAlternative:any=''
 
   constructor(
     private questionService: QuestionService,
     private toastrService: ToastrService,
     private socketService: SocketService,
     private ngxSpinner: NgxSpinnerService
-  ){}
-
-
-  testQuill(): void {
-    const delta = this.quill.getContents()
-    console.log(delta)
+  ){
+    this.loadQuestions()
+    this.loadCredits()
+    this.loadFormQuestionByText()
+    this.loadFormQuestionManual()
+    this.loadModel()
   }
+  
+
+  trackByQuestionId(index: number, question: any): any {
+    return index; // Suponha que cada pergunta tem uma propriedade 'id' única
+  }
+  
 
   resposeReceive(): void {
     this.socketService.getResultSource$.subscribe(
@@ -193,14 +201,22 @@ export class QuestionsRegisterComponent {
     this.saveQuestionsInLocalStorage()
   }
 
+  mapIndexOfEdits(): number {
+    return this.edit.filter((qEdited:boolean)=>{return qEdited==true})
+    .map((result:boolean, index:number)=> index)[0]
+  }
+
   async addNewQuestion(): Promise<void> {
     this.ngxSpinner.show('question-manual-generator')
-    const awaitMoment = await new Promise(resolve=>{setTimeout(() => {resolve('ok')}, 2000)})
     this.questions.unshift(this.newQuestion)
-    this.toastrService.success('Questão adicionada com sucesso')
-    this.saveFormQuestionManual()
-    this.saveQuestionsInLocalStorage()
-    this.ngxSpinner.hide('question-manual-generator')
+    const awaitMoment = await new Promise(resolve=>{setTimeout(() => {
+      this.toastrService.success('Questão adicionada com sucesso')
+      this.saveFormQuestionManual()
+      this.saveQuestionsInLocalStorage()
+      this.ngxSpinner.hide('question-manual-generator')
+      this.saveQuestionsInLocalStorage()
+      resolve(true)
+    }, 1000)})
   }
 
   onProvaSelected(event: any): void {

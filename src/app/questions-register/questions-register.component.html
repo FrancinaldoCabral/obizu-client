@@ -1,32 +1,52 @@
 <div class="container mt-4">
-    <div class="row mb-4 pb-4">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top mb-4">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <img src="assets/img/logotype-paleativo.png" alt="Bootstrap" width="30" height="24">OBizu
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                    </ul>
-                    <form class="d-flex" role="button">
-                        <button class="btn btn-success m-1" type="button" >
-                            <i class="bi bi-save"></i> Entrar
-                        </button>
-                    </form>
-                </div>
+    <nav class="navbar bg-transparent fixed-top">
+        <div class="container-fluid">
+          <button class="navbar-toggler text-start" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">O Bizu</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-        </nav>
-    </div>
-    <div class="row mt-4 pt-4">
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Dropdown
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Action</a></li>
+                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  </ul>
+                </li>
+              </ul>
+              <form class="d-flex" role="button">
+                <button class="btn btn-success m-1" type="button" >
+                    <i class="bi bi-save"></i> Entrar
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+    </nav>
+    <br>
+    <div class="row mt-4 pt-4 align-items-center">
         <div class="col pb-4">
             <span *ngIf="questions.length==0" class="text-center text-muted mt-4 border fw-italic">
                 <br><br><br>
-                <div class="alert alert-secondary" role="alert">
-                    <h3>Crie questões e em seguida salve no banco de dados.</h3>
+                <div class="alert alert-light" role="alert">
+                    <p><em>Crie questões e em seguida salve no banco de dados.</em></p>
                     <button class="btn btn-outline-primary m-1" type="button" 
                         data-bs-toggle="modal" data-bs-target="#questionCreateModal">
                         <i class="bi bi-pencil-square"></i> Criar questões
@@ -69,18 +89,20 @@
                                 </div>
                             </form>
                         </span>
-                        <p class="card-text fs-4 mt-3" *ngIf="!edit[iQuestions]">
-                            {{decodificarSequenciasUnicode(question.statement)}}
-                        </p>
+
+
+                        <!-- QUESTION STATEMENT -->
+                        <span [innerHTML]="question.statement"></span>
                         <form *ngIf="edit[iQuestions]" class="mt-4 mb-4">
                             <h6>Enunciado</h6>
-                            <textarea class="form-control bg-light" 
-                            autosize name="statement" id="statement" 
-                            [(ngModel)]="questions[iQuestions].statement"
-                            (blur)="saveQuestionsInLocalStorage();"></textarea>
+                            <quill-editor class="form-control border-0" name="statement" 
+                            (blur)="saveQuestionsInLocalStorage();"
+                            [ngModel]="question.statement"></quill-editor>
                         </form>
                     </div>
                     <div class="card-body">
+                        
+                        <!-- ALTERNATIVES DISPLAY -->
                         <div class="list-group" *ngIf="!edit[iQuestions]">
                           <button type="button" 
                             class="list-group-item list-group-item-action"
@@ -89,57 +111,73 @@
                                 'bg-light text-success fw-bold': iAlternative==question.answer
                             }"
                             (click)="question.answer=iAlternative; saveQuestionsInLocalStorage();">
-                            {{decodificarSequenciasUnicode(alternative)}}
+                            <span [innerHTML]="alternative"></span>
                           </button>
                         </div>
+
+                        <!-- ALTERNATIVES EDIT -->
                         <span *ngIf="edit[iQuestions]" class="mb-4">
                             <h6>Alternativas</h6>
                             <form>
-                                <div class="input-group mb-4">
-                                    <input type="text" class="form-control border border-2" 
-                                    aria-label="Adicione uma alternativa" aria-describedby="btnAlternativeAdd"
-                                    autosize name="alternative" id="alternative" #alternativeAdd>
-                                    <button class="btn btn-primary" type="button"
-                                    (click)="questions[iQuestions].alternatives.push(alternativeAdd.value)"
-                                    id="btnAlternativeAdd"><i class="bi bi-plus-circle"></i></button>                                
+                                <div class="mb-4 text-center">
+                                    <quill-editor class="form-control border-0 mb-2" 
+                                    (blur)="saveQuestionsInLocalStorage();"
+                                    #alternativeAdd></quill-editor>
+
+                                    <button class="btn btn-primary form-control border-0 mb-2" type="button"
+                                    (click)="questions[iQuestions].alternatives.push(alternativeAdd.content)"
+                                    id="btnAlternativeAdd"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
+                                    <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
                                 </div>
                             </form>
 
                             <form *ngFor="let alternative of question.alternatives;  let iAlternative=index">
-                                <div class="input-group mb-1">
-                                    <button class="btn btn-outline-secondary fw-bold" type="button" id="btnAnswer"
-                                        [ngClass]="{'text-success':questions[iQuestions].answer==iAlternative, 'text-danger':questions[iQuestions].answer!=iAlternative}"
-                                        (click)="questions[iQuestions].answer=iAlternative; saveQuestionsInLocalStorage();">
-                                        <i class="bi bi-check-circle" *ngIf="questions[iQuestions].answer==iAlternative"></i>
-                                        <i class="bi bi-x-circle" *ngIf="questions[iQuestions].answer!=iAlternative"></i>
-                                    </button>
-                                    <input type="text" class="form-control bg-light" 
-                                    aria-label="Recipient's username" aria-describedby="btnAlternativeRemove"
-                                    autosize name="alternative" id="alternative"
-                                    [(ngModel)]="questions[iQuestions].alternatives[iAlternative]">
-                                    <button class="btn btn-outline-danger" type="button"
-                                    (click)="questions[iQuestions].alternatives.splice(iAlternative, 1); saveQuestionsInLocalStorage();"
-                                    id="btnAlternativeRemove"><i class="bi bi-trash"></i></button>
+                                <div class="mb-2">
+                                    <quill-editor class="form-control border-0 mb-2" 
+                                    (blur)="saveQuestionsInLocalStorage();"
+                                    name="{{'alternative'+iAlternative}}"
+                                    [(ngModel)]="questions[iQuestions].alternatives[iAlternative]"></quill-editor>
+                                    <span class="row">
+                                        <div class="col-6">
+                                            <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
+                                            [ngClass]="{'text-success':questions[iQuestions].answer==iAlternative, 'text-danger':questions[iQuestions].answer!=iAlternative}"
+                                            (click)="questions[iQuestions].answer=iAlternative; saveQuestionsInLocalStorage();">
+
+                                            <span *ngIf="questions[iQuestions].answer==iAlternative">
+                                                <i class="bi bi-check-circle"></i> Correto
+                                            </span>
+                                            <span *ngIf="questions[iQuestions].answer!=iAlternative">
+                                                <i class="bi bi-x-circle"></i> Incorreto
+                                            </span>
+                                            
+                                        </button>
+                                        </div>
+                                        <div class="col-6">
+                                            <button class="btn btn-outline-danger form-control" type="button"
+                                            (click)="questions[iQuestions].alternatives.splice(iAlternative, 1); saveQuestionsInLocalStorage();"
+                                            id="btnAlternativeRemove"><i class="bi bi-trash"></i>Remover alternativa</button>
+                                        </div>
+                                    </span>
                                 </div>
                             </form>
                         </span>
                     </div>
-                    <div class="card-body mt-4">
+                    <div class="card-body mt-4 text-success">
                         <h6>Solução comentada</h6>
-                        <p class="card-text text-success" *ngIf="!edit[iQuestions]">
-                            {{decodificarSequenciasUnicode(question.comment)}}
-                        </p>
+                        <span [innerHTML]="question.comment"></span>
                         <form *ngIf="edit[iQuestions]">
-                            <textarea class="form-control bg-light" 
-                            autosize name="comment" id="comment" 
+                            <quill-editor class="form-control border-0 mb-2" 
                             (blur)="saveQuestionsInLocalStorage()"
-                            [(ngModel)]="questions[iQuestions].comment"></textarea>
+                            name="{{'comment'+iQuestions}}" id="{{'comment'+iQuestions}}"
+                            [(ngModel)]="questions[iQuestions].comment"></quill-editor>
                         </form>
                     </div>
                     <div class="card-footer text-end">
                         <button class="btn btn-outline-primary btn-sm m-1" 
                         *ngIf="!edit[iQuestions]"
-                        (click)="edit[iQuestions]=true"><i class="bi bi-pencil-square"></i> Editar</button>
+                        (click)="edit[iQuestions]=true"
+                        type="button" 
+                        data-bs-toggle="modal" data-bs-target="#editQuestion"><i class="bi bi-pencil-square"></i> Editar</button>
                         <button class="btn btn-primary btn-sm m-1" 
                         *ngIf="edit[iQuestions]"
                         (click)="edit[iQuestions]=false; saveQuestionsInLocalStorage()">Finalizar edição</button>
@@ -158,35 +196,28 @@
     </div>
     <br><br>
     <div class="row mt-4">
-        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-bottom">
-            <div class="container-fluid">
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                </ul>
-                <form class="d-flex" role="button">
-                    <button class="btn btn-outline-primary m-1" type="button" 
-                        data-bs-toggle="modal" data-bs-target="#questionCreateModal">
-                        <i class="bi bi-pencil-square"></i> Criar questões
-                    </button>
-                    <button class="btn btn-danger m-1" type="button" [disabled]="questions.length==0"
-                        (click)="removeAll()">
-                        <i class="bi bi-trash"></i> Remover tudo
-                    </button>
-                    <button class="btn btn-success m-1" type="button" [disabled]="questions.length==0"
-                        (click)="saveQuestionsInDB(questions)">
-                        <i class="bi bi-save"></i> Salvar tudo
-                    </button>
-                </form>
-              </div>
-            </div>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-bottom justify-content-center">
+            
+            <form class="d-flex" role="button">
+                <button class="btn btn-outline-primary m-1" type="button" 
+                    data-bs-toggle="modal" data-bs-target="#questionCreateModal">
+                    <i class="bi bi-pencil-square"></i> Criar questões
+                </button>
+                <button class="btn btn-danger m-1" type="button" [disabled]="questions.length==0"
+                    (click)="removeAll()">
+                    <i class="bi bi-trash"></i> Remover tudo
+                </button>
+                <button class="btn btn-success m-1" type="button" [disabled]="questions.length==0"
+                    (click)="saveQuestionsInDB(questions)">
+                    <i class="bi bi-save"></i> Salvar tudo
+                </button>
+            </form>
           </nav>
     </div>
 </div>
-<!-- Criar questões -->
+
+
+<!-- Criar questões com IA -->
 <div class="modal fade" id="questionCreateModal" tabindex="-1" 
     aria-labelledby="questionCreateModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
@@ -194,7 +225,7 @@
         <div class="modal-header">
           <h1 class="modal-title fs-5 me-2" id="questionCreateModalLabel">
             Registro de questões <br>
-            <div class="btn-group me-2" role="group" aria-label="Basic radio toggle button group">
+            <div class="btn-group me-4" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="formType"
                     id="formType1" autocomplete="off" 
                     [checked]="formType=='pdf'"
@@ -212,14 +243,13 @@
                 </label>
               
                 <input type="radio" class="btn-check" name="formType"
-                    id="formType3" autocomplete="off" 
-                    [checked]="formType=='manual'"
-                    (click)="formType='manual'">
+                    id="formType3" autocomplete="off" (click)="clearNewQuestion()"
+                    data-bs-toggle="modal" data-bs-target="#newQuestionModal">
                 <label class="btn btn-outline-primary" for="formType3">
                     <i class="bi bi-pencil"></i> Registrar manualmente
                 </label>
             </div>
-            <button #closeBtn type="button" class="btn btn-secondary ms-1" data-bs-dismiss="modal">Sair</button>
+            <button #closeBtn type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sair</button>
             <button type="button" class="btn btn-dark ms-1" *ngIf="formType=='pdf'"
                 (click)="questionsCreateWithPdf()" [disabled]="!provaFile">
                 <span *ngIf="!uploadSpinner"><i class="bi bi-filetype-pdf"></i> Criar questões com IA (pdf)</span>
@@ -340,91 +370,246 @@
                     <button class="btn btn-light btn-sm" (click)="resetCredits()">Reset</button>
                 </div>
             </span>
-            <span *ngIf="formType=='manual'">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        Nova questão 
-                    </div>
-                    <div class="card-body">
-                        <span class="mb-4">
-                            <h6>Tags</h6>
-                            <form>
-                                <div class="input-group mb-4">
-                                    <input type="text" class="form-control border border-2" 
-                                    aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
-                                    autosize name="tag" id="tag" #tagInput>
-                                    <button class="btn btn-primary" type="button"
-                                    (click)="newQuestion.tags.push(tagInput.value)"
-                                    id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
-                                </div>
-                            </form>
+        </div>
+      </div>
+    </div>
+</div>
 
-                            <form *ngFor="let tag of newQuestion.tags; let iTags=index">
-                                <div class="input-group mb-1">
-                                    <input type="text" class="form-control bg-light" 
-                                    aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
-                                    autosize name="tag" id="tag" [ngModel]="newQuestion.tags[iTags]">
-                                    <button class="btn btn-outline-danger" type="button"
-                                    (click)="newQuestion.tags.splice(iTags, 1)"
-                                    id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
-                                </div>
-                            </form>
-                        </span>
-<!--                         <form class="mt-4 mb-4">
-                            <h6>Enunciado</h6>
-                            <textarea class="form-control bg-light" 
-                            autosize name="statement" id="statement" 
-                            [(ngModel)]="newQuestion.statement"></textarea>
-                        </form> -->
-                        <div id="editor"></div>
+<!-- Editar questões -->
+<div class="modal fade" id="editQuestion" tabindex="-1"
+    aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 me-2" id="editQuestionLabel">
+            <i class="bi bi-pencil-square"></i> Editar questão
+          </h1>
+        </div>
+        <div class="modal-body">
+            <p class="card-text fw-italic" *ngIf="!edit[mapIndexOfEdits()]">
+                Não há questões para editar aqui.
+            </p>
+        </div>
+        <div class="modal-body p-4"  *ngIf="edit[mapIndexOfEdits()]">
+            <!-- Tags -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-bookmark"></i> Tags</h3>
+                <form>
+                    <div class="input-group mb-4">
+                        <input type="text" class="form-control border border-2" 
+                        aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
+                        autosize name="tag" id="tag" #tagInput>
+                        <button class="btn btn-primary" type="button"
+                        (click)="questions[mapIndexOfEdits()].tags.push(tagInput.value)"
+                        id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
                     </div>
-                    <div class="card-body">
-                        <span class="mb-4">
-                            <h6>Alternativas</h6>
-                            <form>
-                                <div class="input-group mb-4">
-                                    <input type="text" class="form-control border border-2" 
-                                    aria-label="Adicione uma alternativa" aria-describedby="btnAlternativeAddNew"
-                                    autosize name="alternative" id="alternative" #alternativeAdd>
-                                    <button class="btn btn-primary" type="button"
-                                    (click)="newQuestion.alternatives.push(alternativeAdd.value)"
-                                    id="btnAlternativeAddNew"><i class="bi bi-plus-circle"></i></button>                                
-                                </div>
-                            </form>
-                            <form *ngFor="let alternative of newQuestion.alternatives;  let iAlternative=index">
-                                <div class="input-group mb-1">
-                                    <button class="btn btn-outline-secondary fw-bold" type="button" id="btnAnswer"
-                                        [ngClass]="{'text-success':newQuestion.answer==iAlternative, 'text-danger':newQuestion.answer!=iAlternative}"
-                                        (click)="newQuestion.answer=iAlternative">
-                                        <i class="bi bi-check-circle" *ngIf="newQuestion.answer==iAlternative"></i>
-                                        <i class="bi bi-x-circle" *ngIf="newQuestion.answer!=iAlternative"></i>
-                                    </button>
-                                    <input type="text" class="form-control bg-light" 
-                                    aria-label="Recipient's username" aria-describedby="btnAlternativeRemoveNew"
-                                    autosize name="alternative" id="alternative" [(ngModel)]="newQuestion.alternatives[iAlternative]">
-                                    <button class="btn btn-outline-danger" type="button"
-                                    (click)="newQuestion.alternatives.splice(iAlternative, 1)"
-                                    id="btnAlternativeRemoveNew"><i class="bi bi-trash"></i></button>
-                                </div>
-                            </form>
-                        </span>
+                </form>
+                <form *ngFor="let tag of questions[mapIndexOfEdits()]?.tags; let iTags=index">
+                    <div class="input-group mb-1">
+                        
+                        <input type="text" class="form-control bg-light" 
+                        aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
+                        autosize name="{{'tag'+mapIndexOfEdits()}}" 
+                        id="{{'tag'+mapIndexOfEdits()}}" 
+                        [ngModel]="questions[mapIndexOfEdits()].tags[iTags]">
+    
+                        <button class="btn btn-outline-danger" type="button"
+                        (click)="questions[mapIndexOfEdits()].tags.splice(iTags, 1)"
+                        id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
                     </div>
-                    <div class="card-body mt-4">
-                        <h6>Solução comentada</h6>
-                        <form>
-                            <textarea class="form-control bg-light" 
-                            autosize name="comment" id="comment" 
-                            [(ngModel)]="newQuestion.comment"></textarea>
-                        </form>
-                    </div>
-                    <div class="card-footer text-end">                      
-                        <button class="btn btn-danger btn-sm m-1" 
-                            (click)="clearNewQuestion()">
-                            <i class="bi bi-trash"></i> Limpar
-                        </button>
-                    </div>
-                </div>
+                </form>
             </span>
+            <!-- Enunciado da questão -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-question-circle"></i> Enunciado</h3>
+                <form *ngIf="edit.length>0">
+                    <quill-editor class="form-control border-0 mb-2" 
+                    (blur)="saveQuestionsInLocalStorage()"
+                    name="{{'statement'+mapIndexOfEdits()}}" id="{{'statement'+mapIndexOfEdits()}}"
+                    [(ngModel)]="questions[mapIndexOfEdits()].statement"></quill-editor>
+                </form>
+            </span>
+            <!-- Alternativas -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-check-circle"></i> Alternativas</h3>
+                <form>
+                    <div class="mb-4 text-center">
+                        <quill-editor name="newAlternative" class="form-control border-0 mb-2"
+                        [(ngModel)]="newAlternative"></quill-editor>
+
+                        <button class="btn btn-primary form-control border-0 mb-2" type="button"
+                        (click)="questions[mapIndexOfEdits()].alternatives.push(newAlternative)"
+                        id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
+                        <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
+
+                        
+                    </div>
+                    <div class="mb-2" *ngFor="let alternative of questions[mapIndexOfEdits()].alternatives; trackBy: trackByQuestionId; let iAlt=index">
+                        <quill-editor class="form-control border-0 mb-2" 
+                        name="{{'question'+mapIndexOfEdits()+'alt'+'-'+iAlt}}"
+                        id="{{'question'+mapIndexOfEdits()+'alt'+'-'+iAlt}}"
+                        [(ngModel)]="questions[mapIndexOfEdits()].alternatives[iAlt]"
+                        ></quill-editor>
+                        
+                        <span class="row">
+                            <div class="col-6">
+                                
+                                <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
+                                [ngClass]="{'text-success':questions[mapIndexOfEdits()].answer==iAlt, 'text-danger':questions[mapIndexOfEdits()].answer!=iAlt}"
+                                (click)="questions[mapIndexOfEdits()].answer=iAlt; saveQuestionsInLocalStorage();">
+
+                                <span *ngIf="questions[mapIndexOfEdits()].answer==iAlt">
+                                    <i class="bi bi-check-circle"></i> <br> Correto
+                                </span>
+                                <span *ngIf="questions[mapIndexOfEdits()].answer!=iAlt">
+                                    <i class="bi bi-x-circle"></i> <br> Incorreto
+                                </span>
+                                
+                            </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-danger form-control" type="button"
+                                (click)="questions[mapIndexOfEdits()].alternatives.splice(iAlt, 1); saveQuestionsInLocalStorage();"
+                                id="btnAlternativeRemove"><i class="bi bi-trash"></i> <br> Remover</button>
+                            </div>
+                        </span>
+                    </div>
+                </form>
+            </span>
+            <!-- Solução comentada -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-check-circle-fill"></i> Solução comentada</h3>
+                <form>
+                    <quill-editor class="form-control border-0 mb-2" 
+                    (blur)="saveQuestionsInLocalStorage()"
+                    name="{{'comment'+mapIndexOfEdits()}}" id="{{'comment'+mapIndexOfEdits()}}"
+                    [(ngModel)]="questions[mapIndexOfEdits()].comment"></quill-editor>
+                </form>
+            </span>
+        </div>
+        <div class="card-footer text-end pb-2">
+            <button class="btn btn-light btn-sm m-1" type="button" data-bs-dismiss="modal">Sair</button>
+            <button class="btn btn-primary btn-sm m-1" 
+            *ngIf="edit[mapIndexOfEdits()]"
+            (click)="edit[mapIndexOfEdits()]=false; saveQuestionsInLocalStorage();"
+            type="button" data-bs-dismiss="modal">Finalizar edição</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Nova questão -->
+<div class="modal fade" id="newQuestionModal" tabindex="-1"
+    aria-labelledby="newQuestionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 me-2" id="newQuestionLabel">
+            <i class="bi bi-pencil-square"></i> Nova questão
+          </h1>
+        </div>
+        <div class="modal-body p-4">
+            <!-- Tags -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-bookmark"></i> Tags</h3>
+                <form>
+                    <div class="input-group mb-4">
+                        <input type="text" class="form-control border border-2" 
+                        aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
+                        autosize name="tag" id="tag" #tagInput>
+                        <button class="btn btn-primary" type="button"
+                        (click)="newQuestion.tags.push(tagInput.value)"
+                        id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
+                    </div>
+                </form>
+                <form *ngFor="let tag of newQuestion?.tags; trackBy: trackByQuestionId; let iTags=index">
+                    <div class="input-group mb-1">
+                        
+                        <input type="text" class="form-control bg-light" 
+                        aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
+                        autosize name="{{'tag'+iTags}}" 
+                        id="{{'tag'+iTags}}" 
+                        [(ngModel)]="newQuestion.tags[iTags]">
+    
+                        <button class="btn btn-outline-danger" type="button"
+                        (click)="newQuestion.tags.splice(iTags, 1)"
+                        id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
+                    </div>
+                </form>
+            </span>
+            <!-- Enunciado da questão -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-question-circle"></i> Enunciado</h3>
+                <form>
+                    <quill-editor class="form-control border-0 mb-2" 
+                    name="newStatement" id="newStatement"
+                    [(ngModel)]="newQuestion.statement"></quill-editor>
+                </form>
+            </span>
+            <!-- Alternativas -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-check-circle"></i> Alternativas</h3>
+                <form>
+                    <div class="mb-4 text-center">
+                        <quill-editor name="newAlternative" class="form-control border-0 mb-2"
+                        [(ngModel)]="newAlternative"></quill-editor>
+
+                        <button class="btn btn-primary form-control border-0 mb-2" type="button"
+                        (click)="newQuestion.alternatives.push(newAlternative)"
+                        id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
+                        <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
+
+                        
+                    </div>
+                    <div class="mb-2" 
+                    *ngFor="let alternative of newQuestion.alternatives; trackBy: trackByQuestionId; let iAlt=index">
+                        <quill-editor class="form-control border-0 mb-2" 
+                        name="{{'question'+iAlt+'alt'+'-'+iAlt}}"
+                        id="{{'question'+iAlt+'alt'+'-'+iAlt}}"
+                        [(ngModel)]="newQuestion.alternatives[iAlt]"
+                        ></quill-editor>
+                        
+                        <span class="row">
+                            <div class="col-6">
+                                
+                                <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
+                                [ngClass]="{'text-success':newQuestion.answer==iAlt, 'text-danger':newQuestion.answer!=iAlt}"
+                                (click)="newQuestion.answer=iAlt; saveQuestionsInLocalStorage();">
+
+                                <span *ngIf="newQuestion.answer==iAlt">
+                                    <i class="bi bi-check-circle"></i> <br> Correto
+                                </span>
+                                <span *ngIf="newQuestion.answer!=iAlt">
+                                    <i class="bi bi-x-circle"></i> <br> Incorreto
+                                </span>
+                                
+                            </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-outline-danger form-control" type="button"
+                                (click)="newQuestion.alternatives.splice(iAlt, 1); saveQuestionsInLocalStorage();"
+                                id="btnAlternativeRemove"><i class="bi bi-trash"></i> <br> Remover</button>
+                            </div>
+                        </span>
+                    </div>
+                </form>
+            </span>
+            <!-- Solução comentada -->
+            <span class="p-1 m-2">
+                <h3><i class="bi bi-check-circle-fill"></i> Solução comentada</h3>
+                <form>
+                    <quill-editor class="form-control border-0 mb-2" 
+                    (blur)="saveQuestionsInLocalStorage()"
+                    name="newQuestionComment" id="newQuestionComment"
+                    [(ngModel)]="newQuestion.comment"></quill-editor>
+                </form>
+            </span>
+        </div>
+        <div class="card-footer text-end pb-2">
+            <button class="btn btn-light btn-sm m-1" type="button" data-bs-dismiss="modal">Sair</button>
+            <button class="btn btn-primary btn-sm m-1" 
+            (click)="questions.push(newQuestion); saveQuestionsInLocalStorage();"
+            type="button" data-bs-dismiss="modal">Adicionar</button>
         </div>
       </div>
     </div>
