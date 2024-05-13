@@ -7,9 +7,9 @@ export const routes: Routes = [
     //{ path:'questions-register', title:'Registro de questões', component: QuestionsRegisterComponent },
     { 
         path:'', 
-        title:'Registro de questões', 
+        title:'Criação', 
         component: QuestionsRegisterComponent, 
     },
-    { path:'questions-edit', title:'Edição de questões', component: QuestionsEditComponent },
-    { path:'questions-random', title:'Questões Randomicas', component: QuestionsRandomComponent }
+    { path:'edit', title:'Edição', component: QuestionsEditComponent },
+    { path:'random', title:'Randômicas', component: QuestionsRandomComponent }
 ]

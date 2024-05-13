@@ -1,47 +1,5 @@
-<div class="container mt-4">
-    <nav class="navbar bg-transparent fixed-top">
-        <div class="container-fluid">
-          <button class="navbar-toggler text-start" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-            <div class="offcanvas-header">
-              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">O Bizu</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Dropdown
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">Action</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li>
-                      <hr class="dropdown-divider">
-                    </li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
-                  </ul>
-                </li>
-              </ul>
-              <form class="d-flex" role="button">
-                <button class="btn btn-success m-1" type="button" >
-                    <i class="bi bi-save"></i> Entrar
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-    </nav>
-    <br>
-    <div class="row mt-4 pt-4 align-items-center">
+<div class="container pt-4 mt-4">
+    <div class="row pt-4 align-items-center">
         <div class="col pb-4">
             <span *ngIf="questions.length==0" class="text-center text-muted mt-4 fw-italic">
                 <br><br><br>
@@ -63,7 +21,9 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#newQuestionModal">
+                                <a class="dropdown-item cursor" data-bs-toggle="modal" 
+                                (click)="clearNewQuestion()"
+                                data-bs-target="#newQuestionModal">
                                     <i class="bi bi-pencil"></i> Criar questão (manual)
                                 </a>
                             </li>
@@ -71,134 +31,49 @@
                     </div>
                 </div>
             </span>
+
+            <!-- QUESTÕES -->
             <span *ngIf="questions.length>0">
-                <div class="card mb-4 animate__animated animate__fadeIn" *ngFor="let question of questions; let iQuestions=index">
+                <div class="card mb-4 animate__animated animate__fadeIn" 
+                *ngFor="let question of questions; let iQuestions=index">
                     <div class="card-header">
                         #{{iQuestions+1}} 
                     </div>
                     <div class="card-body">
-                        <span *ngIf="!edit[iQuestions]">
+                        <!-- Categorias -->
+                        <span>
                             <span class="badge rounded-pill text-bg-light m-1" 
-                                *ngFor="let tag of question.tags">
+                                *ngFor="let tag of question.categories">
                                 {{decodificarSequenciasUnicode(tag)}}
                             </span>
                         </span>
-                        <span *ngIf="edit[iQuestions]" class="mb-4">
-                            <h6>Tags</h6>
-                            <form>
-                                <div class="input-group mb-4">
-                                    <input type="text" class="form-control border border-2" 
-                                    aria-label="Adicione uma tag" aria-describedby="btnTagAdd"
-                                    autosize name="tag" id="tag" #tagInput>
-                                    <button class="btn btn-primary" type="button"
-                                    (click)="questions[iQuestions].tags.push(tagInput.value); saveQuestionsInLocalStorage();"
-                                    id="btnTagAdd"><i class="bi bi-plus-circle"></i></button>                                
-                                </div>
-                            </form>
-
-                            <form *ngFor="let tag of question.tags; let iTags=index">
-                                <div class="input-group mb-1">
-                                    <input type="text" class="form-control bg-light" 
-                                    aria-label="Recipient's username" aria-describedby="btnTagRemove"
-                                    autosize name="tag" id="tag" [(ngModel)]="questions[iQuestions].tags[iTags]">
-                                    <button class="btn btn-outline-danger" type="button"
-                                    (click)="questions[iQuestions].tags.splice(iTags, 1); saveQuestionsInLocalStorage();"
-                                    id="btnTagRemove"><i class="bi bi-trash"></i></button>
-                                </div>
-                            </form>
-                        </span>
-
                         <!-- QUESTION STATEMENT -->
                         <span [innerHTML]="question.statement"></span>
-                        <form *ngIf="edit[iQuestions]" class="mt-4 mb-4">
-                            <h6>Enunciado</h6>
-                            <quill-editor class="form-control border-0" name="statement" 
-                            (blur)="saveQuestionsInLocalStorage();"
-                            [ngModel]="question.statement"></quill-editor>
-                        </form>
                     </div>
                     <div class="card-body">
-                        
                         <!-- ALTERNATIVES DISPLAY -->
-                        <div class="list-group" *ngIf="!edit[iQuestions]">
+                        <div class="list-group">
                           <button type="button" 
                             class="list-group-item list-group-item-action"
                             *ngFor="let alternative of question.alternatives; let iAlternative=index"
                             [ngClass]="{
                                 'bg-light text-success fw-bold': iAlternative==question.answer
-                            }"
-                            (click)="question.answer=iAlternative; saveQuestionsInLocalStorage();">
+                            }">
                             <span [innerHTML]="alternative"></span>
                           </button>
                         </div>
-
-                        <!-- ALTERNATIVES EDIT -->
-                        <span *ngIf="edit[iQuestions]" class="mb-4">
-                            <h6>Alternativas</h6>
-                            <form>
-                                <div class="mb-4 text-center">
-                                    <quill-editor class="form-control border-0 mb-2" 
-                                    (blur)="saveQuestionsInLocalStorage();"
-                                    #alternativeAdd></quill-editor>
-
-                                    <button class="btn btn-primary form-control border-0 mb-2" type="button"
-                                    (click)="questions[iQuestions].alternatives.push(alternativeAdd.content)"
-                                    id="btnAlternativeAdd"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
-                                    <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
-                                </div>
-                            </form>
-
-                            <form *ngFor="let alternative of question.alternatives;  let iAlternative=index">
-                                <div class="mb-2">
-                                    <quill-editor class="form-control border-0 mb-2" 
-                                    (blur)="saveQuestionsInLocalStorage();"
-                                    name="{{'alternative'+iAlternative}}"
-                                    [(ngModel)]="questions[iQuestions].alternatives[iAlternative]"></quill-editor>
-                                    <span class="row">
-                                        <div class="col-6">
-                                            <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
-                                            [ngClass]="{'text-success':questions[iQuestions].answer==iAlternative, 'text-danger':questions[iQuestions].answer!=iAlternative}"
-                                            (click)="questions[iQuestions].answer=iAlternative; saveQuestionsInLocalStorage();">
-
-                                            <span *ngIf="questions[iQuestions].answer==iAlternative">
-                                                <i class="bi bi-check-circle"></i> Correto
-                                            </span>
-                                            <span *ngIf="questions[iQuestions].answer!=iAlternative">
-                                                <i class="bi bi-x-circle"></i> Incorreto
-                                            </span>
-                                            
-                                        </button>
-                                        </div>
-                                        <div class="col-6">
-                                            <button class="btn btn-outline-danger form-control" type="button"
-                                            (click)="questions[iQuestions].alternatives.splice(iAlternative, 1); saveQuestionsInLocalStorage();"
-                                            id="btnAlternativeRemove"><i class="bi bi-trash"></i>Remover alternativa</button>
-                                        </div>
-                                    </span>
-                                </div>
-                            </form>
-                        </span>
                     </div>
-                    <div class="card-body mt-4 text-success">
-                        <h6>Solução comentada</h6>
+                    <div class="card-body mt-4">
+                        <h6 class="display-6">Solução comentada</h6>
                         <span [innerHTML]="question.comment"></span>
-                        <form *ngIf="edit[iQuestions]">
-                            <quill-editor class="form-control border-0 mb-2" 
-                            (blur)="saveQuestionsInLocalStorage()"
-                            name="{{'comment'+iQuestions}}" id="{{'comment'+iQuestions}}"
-                            [(ngModel)]="questions[iQuestions].comment"></quill-editor>
-                        </form>
                     </div>
                     <div class="card-footer text-end">
                         <button class="btn btn-outline-primary btn-sm m-1" 
-                        *ngIf="!edit[iQuestions]"
-                        (click)="edit[iQuestions]=true"
                         type="button" 
-                        data-bs-toggle="modal" data-bs-target="#editQuestion"><i class="bi bi-pencil-square"></i> Editar</button>
-                        <button class="btn btn-primary btn-sm m-1" 
-                        *ngIf="edit[iQuestions]"
-                        (click)="edit[iQuestions]=false; saveQuestionsInLocalStorage()">Finalizar edição</button>
-                        
+                        (click)="edit[iQuestions]=true"
+                        data-bs-toggle="modal" data-bs-target="#editQuestion">
+                        <i class="bi bi-pencil-square"></i> Editar</button>
+     
                         <button class="btn btn-danger btn-sm m-1" 
                             (click)="removeQuestion(iQuestions)">
                             <i class="bi bi-trash"></i> Remover
@@ -211,12 +86,13 @@
             </span>
         </div>
     </div>
+
     <br><br>
     <div class="row mt-4">
         <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-bottom justify-content-center">
             <div class="btn-group dropup">
                 <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-robot"></i> Criar com IA
+                    <i class="bi bi-robot"></i> Criar
                 </button>
                 <ul class="dropdown-menu">
                     <li>
@@ -230,7 +106,9 @@
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#newQuestionModal">
+                        <a class="dropdown-item cursor" data-bs-toggle="modal" 
+                        (click)="clearNewQuestion()"
+                        data-bs-target="#newQuestionModal">
                             <i class="bi bi-pencil"></i> Criar questão (manual)
                         </a>
                     </li>
@@ -418,30 +296,30 @@
             </p>
         </div>
         <div class="modal-body p-4"  *ngIf="edit[mapIndexOfEdits()]">
-            <!-- Tags -->
+            <!-- Categorias -->
             <span class="p-1 m-2">
-                <h3><i class="bi bi-bookmark"></i> Tags</h3>
+                <h3><i class="bi bi-bookmark"></i> Categorias</h3>
                 <form>
                     <div class="input-group mb-4">
                         <input type="text" class="form-control border border-2" 
                         aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
                         autosize name="tag" id="tag" #tagInput>
                         <button class="btn btn-primary" type="button"
-                        (click)="questions[mapIndexOfEdits()].tags.push(tagInput.value)"
+                        (click)="questions[mapIndexOfEdits()].categories.push(tagInput.value)"
                         id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
                     </div>
                 </form>
-                <form *ngFor="let tag of questions[mapIndexOfEdits()]?.tags; let iTags=index">
+                <form *ngFor="let tag of questions[mapIndexOfEdits()]?.categories; let iCategories=index">
                     <div class="input-group mb-1">
                         
                         <input type="text" class="form-control bg-light" 
                         aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
                         autosize name="{{'tag'+mapIndexOfEdits()}}" 
                         id="{{'tag'+mapIndexOfEdits()}}" 
-                        [ngModel]="questions[mapIndexOfEdits()].tags[iTags]">
+                        [ngModel]="questions[mapIndexOfEdits()].categories[iCategories]">
     
                         <button class="btn btn-outline-danger" type="button"
-                        (click)="questions[mapIndexOfEdits()].tags.splice(iTags, 1)"
+                        (click)="questions[mapIndexOfEdits()].categories.splice(iCategories, 1)"
                         id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
                     </div>
                 </form>
@@ -515,7 +393,9 @@
             </span>
         </div>
         <div class="card-footer text-end pb-2">
-            <button class="btn btn-light btn-sm m-1" type="button" data-bs-dismiss="modal">Sair</button>
+            <button class="btn btn-light btn-sm m-1" 
+            type="button" data-bs-dismiss="modal"
+            (click)="edit[mapIndexOfEdits()]=false;">Sair</button>
             <button class="btn btn-primary btn-sm m-1" 
             *ngIf="edit[mapIndexOfEdits()]"
             (click)="edit[mapIndexOfEdits()]=false; saveQuestionsInLocalStorage();"
@@ -536,30 +416,30 @@
           </h1>
         </div>
         <div class="modal-body p-4">
-            <!-- Tags -->
+            <!-- Categorias -->
             <span class="p-1 m-2">
-                <h3><i class="bi bi-bookmark"></i> Tags</h3>
+                <h3><i class="bi bi-bookmark"></i> Categorias</h3>
                 <form>
                     <div class="input-group mb-4">
                         <input type="text" class="form-control border border-2" 
                         aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
                         autosize name="tag" id="tag" #tagInput>
                         <button class="btn btn-primary" type="button"
-                        (click)="newQuestion.tags.push(tagInput.value)"
+                        (click)="newQuestion.categories.push(tagInput.value)"
                         id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
                     </div>
                 </form>
-                <form *ngFor="let tag of newQuestion?.tags; trackBy: trackByQuestionId; let iTags=index">
+                <form *ngFor="let tag of newQuestion.categories; trackBy: trackByQuestionId; let iCategories=index">
                     <div class="input-group mb-1">
                         
                         <input type="text" class="form-control bg-light" 
                         aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
-                        autosize name="{{'tag'+iTags}}" 
-                        id="{{'tag'+iTags}}" 
-                        [(ngModel)]="newQuestion.tags[iTags]">
+                        autosize name="{{'tag'+iCategories}}" 
+                        id="{{'tag'+iCategories}}" 
+                        [(ngModel)]="newQuestion.categories[iCategories]">
     
                         <button class="btn btn-outline-danger" type="button"
-                        (click)="newQuestion.tags.splice(iTags, 1)"
+                        (click)="newQuestion.categories.splice(iCategories, 1)"
                         id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
                     </div>
                 </form>

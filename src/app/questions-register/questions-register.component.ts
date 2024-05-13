@@ -14,11 +14,10 @@ import { QuillModule } from 'ngx-quill'
   imports: [
     CommonModule,
     FormsModule,
-    HttpClientModule,
     QuillModule
   ],
   providers: [
-    SocketService,
+    //SocketService,
     QuestionService
   ],
   templateUrl: './questions-register.component.html',
@@ -50,7 +49,7 @@ export class QuestionsRegisterComponent {
   selectedQuestions: number[] = []
 
   newQuestion: any = {
-    tags: [],
+    categories: [],
     statement:'',
     alternatives: [],
     answer: 0,
@@ -65,6 +64,49 @@ export class QuestionsRegisterComponent {
     private socketService: SocketService,
     private ngxSpinner: NgxSpinnerService
   ){
+    this.socketService.getResultSource$.subscribe(
+      response => {
+          const { status, job } = response
+          if(status.toLowerCase()=='completed'){ 
+              const { result } = response        
+              console.log('result in component: ', result)
+              const { credits, questions } = result
+              this.toastrService.success(`${questions.length} questões criadas.`)
+              this.credits = credits
+              this.totalCredits += credits
+         
+              questions.forEach((question:any) => {
+                this.questions.unshift(question)
+              })
+
+              this.saveQuestionsInLocalStorage()
+              this.saveCredits()
+
+              this.ngxSpinner.hide('question-ia-generator')
+          }
+
+          if(status.toLowerCase()=='failed'){
+              this.ngxSpinner.hide('question-ia-generator')
+              this.toastrService.error(`Erro na criação de questões.`)
+          }
+      },
+      error => {
+          this.ngxSpinner.hide('question-ia-generator')
+          console.log('socket service getResultSource error: ', error)
+          this.toastrService.error(`Erro de conexão.`)
+      }
+    )
+
+    this.socketService.getConnecSource$.subscribe(
+        connect => {
+            if(connect){
+                //this.fetchFiles()
+            }else{
+              this.ngxSpinner.hide('question-ia-generator')
+            }
+        }
+    )
+
     this.loadQuestions()
     this.loadCredits()
     this.loadFormQuestionByText()
@@ -78,7 +120,7 @@ export class QuestionsRegisterComponent {
   }
   
 
-  resposeReceive(): void {
+/*   resposeReceive(): void {
     this.socketService.getResultSource$.subscribe(
       response => {
           const { status, job } = response
@@ -114,7 +156,7 @@ export class QuestionsRegisterComponent {
             }
         }
     )
-  }
+  } */
 
   saveCredits(): void {
     window.localStorage.setItem('credits', JSON.stringify(this.credits))
@@ -177,7 +219,7 @@ export class QuestionsRegisterComponent {
 
   clearNewQuestion(): void {
     this.newQuestion = {
-      tags: [],
+      categories: [],
       statement:'',
       alternatives: [],
       answer: 0,

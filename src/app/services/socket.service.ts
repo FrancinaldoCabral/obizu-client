@@ -49,11 +49,12 @@ export class SocketService {
 
 
     this.socket.on('results', (result)=>{
+      console.log(result)
       this.resultSource.next(result)
     })
     
     this.socket.on('failed', (result)=>{
-
+      console.log('failed')
     })
   }
 

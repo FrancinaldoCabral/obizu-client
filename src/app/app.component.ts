@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core'
-import { RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router'
 import { AuthService } from './services/auth.service'
 import { SocketService } from './services/socket.service'
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
 import { HTTP_INTERCEPTORS } from '@angular/common/http'
 import { TokenInterceptor } from './services/token.interceptor'
-import { LoginComponent } from './login/login.component';
-import { QuestionService } from './services/question.service';
+import { LoginComponent } from './login/login.component'
+import { QuestionService } from './services/question.service'
+import { NavbarComponent } from './navbar/navbar.component'
 
 //declare var hljs: any
 
@@ -16,6 +17,7 @@ import { QuestionService } from './services/question.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   imports: [
+    NavbarComponent,
     LoginComponent,
     NgxSpinnerModule,
     RouterModule

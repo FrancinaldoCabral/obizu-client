@@ -21,7 +21,7 @@ const toolbar = [
   [{ 'direction': 'rtl' }],                         // text direction
 
 //  [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+  [{ 'header': [5,6, false] }],
 
   [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
   [{ 'font': [] }],
