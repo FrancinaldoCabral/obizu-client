@@ -1,9 +1,3 @@
-<div class="container">
-
-</div>
-
-
-<!-- pagination.component.html -->
 
 <div class="container pt-4 mt-4">
     <div class="row">
@@ -31,7 +25,7 @@
                 </div>
                 <div class="col-4">
                     <div class="input-group mb-4">
-                        <input type="text" class="form-control border border-2" 
+                        <input type="number" min="1" class="form-control border border-2" 
                         aria-label="itens por página" aria-describedby="reloadBtn"
                         autosize name="pageSize" id="pageSize" [(ngModel)]="pageSize">
                         <button id="reloadBtn" class="btn btn-light btn-sm"
@@ -43,30 +37,30 @@
                 <br><br><br>
                 <div class="alert alert-light" role="alert">
                     <p><em>Crie questões e em seguida salve no banco de dados.</em></p>
-                    <button type="button" class="btn btn-outline-dard m-2" routerLink="">
+                    <button type="button" class="btn btn-outline-dard m-2" routerLink="new">
                         <i class="bi bi-robot"></i> Criar questões
                     </button>
                 </div>
             </span>
             <span *ngIf="questions.length>0">
+<!--                 <span *ngFor="let question of questions; let iQuestions=index">
+                    <app-question [question]="questions[iQuestions]" [isEditable]="true"></app-question>
+                </span> -->
                 <div class="card mb-4 animate__animated animate__fadeIn" 
                 *ngFor="let question of questions; let iQuestions=index">
                     <div class="card-header">
                         #{{iQuestions+1}} 
                     </div>
                     <div class="card-body">
-                        <!-- TAGS -->
                         <span>
-                            <span class="badge rounded-pill text-bg-light m-1" 
-                                *ngFor="let tag of question.categories">
-                                {{decodificarSequenciasUnicode(tag)}}
+                            <span class="badge rounded-pill text-bg-light mb-4 me-1" 
+                                *ngFor="let category of question.categories">
+                                {{decodificarSequenciasUnicode(category)}}
                             </span>
                         </span>
-                        <!-- QUESTION STATEMENT -->
                         <span [innerHTML]="question.statement"></span>
                     </div>
                     <div class="card-body">
-                        <!-- ALTERNATIVES DISPLAY -->
                         <div class="list-group">
                             <button type="button" 
                             class="list-group-item list-group-item-action"
@@ -85,9 +79,9 @@
                     <div class="card-footer text-end">
                         <button class="btn btn-outline-primary btn-sm m-1" 
                         type="button" 
-                        data-bs-toggle="modal" 
+                        data-bs-toggle="modal"
                         data-bs-target="#editQuestion"
-                        (click)="edit[iQuestions]=true">
+                        (click)="editQuestion=question;">
                         <i class="bi bi-pencil-square"></i> Editar</button>
 
                         <button class="btn btn-danger btn-sm m-1" 
@@ -120,7 +114,7 @@
             </nav>
         </div>
     </div>
-  </div>
+</div>
 
   <!-- Editar questões -->
 <div class="modal fade" id="editQuestion" tabindex="-1"
@@ -133,46 +127,46 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
       </h1>
     </div>
     <div class="modal-body">
-        <p class="card-text fw-italic" *ngIf="!edit[mapIndexOfEdits()]">
+        <p class="card-text fw-italic" *ngIf="editQuestion==null">
             Não há questões para editar aqui.
         </p>
     </div>
-    <div class="modal-body p-4"  *ngIf="edit[mapIndexOfEdits()]">
+    <div class="modal-body p-4"  *ngIf="editQuestion!=null">
         <!-- Categorias -->
         <span class="p-1 m-2">
             <h3><i class="bi bi-bookmark"></i> Categorias</h3>
             <form>
                 <div class="input-group mb-4">
                     <input type="text" class="form-control border border-2" 
-                    aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
-                    autosize name="tag" id="tag" #tagInput>
+                    aria-label="Adicione uma category" aria-describedby="btncategoryAddNew"
+                    autosize name="category" id="category" #categoryInput>
                     <button class="btn btn-primary" type="button"
-                    (click)="questions[mapIndexOfEdits()].categories.push(tagInput.value)"
-                    id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
+                    (click)="editQuestion.categories.push(categoryInput.value)"
+                    id="btncategoryAddNew"><i class="bi bi-plus-circle"></i></button>                                
                 </div>
             </form>
-            <form *ngFor="let tag of questions[mapIndexOfEdits()]?.categories; let iCategories=index">
+            <form *ngFor="let category of editQuestion?.categories; let iCategories=index">
                 <div class="input-group mb-1">
                     
                     <input type="text" class="form-control bg-light" 
-                    aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
-                    autosize name="{{'tag'+mapIndexOfEdits()}}" 
-                    id="{{'tag'+mapIndexOfEdits()}}" 
-                    [ngModel]="questions[mapIndexOfEdits()].categories[iCategories]">
+                    aria-label="Recipient's username" aria-describedby="btncategoryRemoveNew"
+                    autosize name="{{'category'+editQuestion._id}}" 
+                    id="{{'category'+editQuestion._id}}" 
+                    [ngModel]="editQuestion.categories[iCategories]">
 
                     <button class="btn btn-outline-danger" type="button"
-                    (click)="questions[mapIndexOfEdits()].categories.splice(iCategories, 1)"
-                    id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
+                    (click)="editQuestion.categories.splice(iCategories, 1)"
+                    id="btncategoryRemoveNew"><i class="bi bi-trash"></i></button>
                 </div>
             </form>
         </span>
         <!-- Enunciado da questão -->
         <span class="p-1 m-2">
             <h3><i class="bi bi-question-circle"></i> Enunciado</h3>
-            <form *ngIf="edit.length>0">
+            <form *ngIf="editQuestion">
                 <quill-editor class="form-control border-0 mb-2" 
-                name="{{'statement'+mapIndexOfEdits()}}" id="{{'statement'+mapIndexOfEdits()}}"
-                [(ngModel)]="questions[mapIndexOfEdits()].statement"></quill-editor>
+                name="{{'statement'+editQuestion._id}}" id="{{'statement'+editQuestion._id}}"
+                [(ngModel)]="editQuestion.statement"></quill-editor>
             </form>
         </span>
         <!-- Alternativas -->
@@ -184,30 +178,30 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
                     [(ngModel)]="newAlternative"></quill-editor>
 
                     <button class="btn btn-primary form-control border-0 mb-2" type="button"
-                    (click)="questions[mapIndexOfEdits()].alternatives.push(newAlternative)"
+                    (click)="editQuestion.alternatives.push(newAlternative)"
                     id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
                     <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
 
                     
                 </div>
-                <div class="mb-2" *ngFor="let alternative of questions[mapIndexOfEdits()].alternatives; trackBy: trackByQuestionId; let iAlt=index">
+                <div class="mb-2" *ngFor="let alternative of editQuestion.alternatives; trackBy: trackByQuestionId; let iAlt=index">
                     <quill-editor class="form-control border-0 mb-2" 
-                    name="{{'question'+mapIndexOfEdits()+'alt'+'-'+iAlt}}"
-                    id="{{'question'+mapIndexOfEdits()+'alt'+'-'+iAlt}}"
-                    [(ngModel)]="questions[mapIndexOfEdits()].alternatives[iAlt]"
+                    name="{{'question'+editQuestion._id+'alt'+'-'+iAlt}}"
+                    id="{{'question'+editQuestion._id+'alt'+'-'+iAlt}}"
+                    [(ngModel)]="editQuestion.alternatives[iAlt]"
                     ></quill-editor>
                     
                     <span class="row">
                         <div class="col-6">
                             
                             <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
-                            [ngClass]="{'text-success':questions[mapIndexOfEdits()].answer==iAlt, 'text-danger':questions[mapIndexOfEdits()].answer!=iAlt}"
-                            (click)="questions[mapIndexOfEdits()].answer=iAlt">
+                            [ngClass]="{'text-success':editQuestion.answer==iAlt, 'text-danger':editQuestion.answer!=iAlt}"
+                            (click)="editQuestion.answer=iAlt">
 
-                            <span *ngIf="questions[mapIndexOfEdits()].answer==iAlt">
+                            <span *ngIf="editQuestion.answer==iAlt">
                                 <i class="bi bi-check-circle"></i> <br> Correto
                             </span>
-                            <span *ngIf="questions[mapIndexOfEdits()].answer!=iAlt">
+                            <span *ngIf="editQuestion.answer!=iAlt">
                                 <i class="bi bi-x-circle"></i> <br> Incorreto
                             </span>
                             
@@ -215,7 +209,7 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
                         </div>
                         <div class="col-6">
                             <button class="btn btn-outline-danger form-control" type="button"
-                            (click)="questions[mapIndexOfEdits()].alternatives.splice(iAlt, 1)"
+                            (click)="editQuestion.alternatives.splice(iAlt, 1)"
                             id="btnAlternativeRemove"><i class="bi bi-trash"></i> <br> Remover</button>
                         </div>
                     </span>
@@ -227,18 +221,18 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
             <h3><i class="bi bi-check-circle-fill"></i> Solução comentada</h3>
             <form>
                 <quill-editor class="form-control border-0 mb-2" 
-                name="{{'comment'+mapIndexOfEdits()}}" id="{{'comment'+mapIndexOfEdits()}}"
-                [(ngModel)]="questions[mapIndexOfEdits()].comment"></quill-editor>
+                name="{{'comment'+editQuestion._id}}" id="{{'comment'+editQuestion._id}}"
+                [(ngModel)]="editQuestion.comment"></quill-editor>
             </form>
         </span>
     </div>
     <div class="card-footer text-end pb-2">
         <button class="btn btn-light btn-sm m-1" 
-        (click)="edit[mapIndexOfEdits()]=false"
+        (click)="editQuestion=null"
         type="button" data-bs-dismiss="modal">Sair</button>
         <button class="btn btn-primary btn-sm m-1" 
-        *ngIf="edit[mapIndexOfEdits()]"
-        (click)="edit[mapIndexOfEdits()]=false"
+        *ngIf="editQuestion"
+        (click)="updateQuestion(editQuestion)"
         type="button" data-bs-dismiss="modal">Finalizar edição</button>
     </div>
   </div>

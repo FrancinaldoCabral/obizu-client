@@ -1,1 +1,167 @@
-<p>question works!</p>
+<div class="card m-2 p-2 animate__animated animate__fadeIn">
+    <div class="card-body">
+        <!-- CATEGORIAS -->
+        <span>
+            <span class="badge rounded-pill text-bg-light m-1" 
+                *ngFor="let category of question.categories">
+                {{decodificarSequenciasUnicode(category)}}
+            </span>
+        </span>
+        <!-- QUESTION STATEMENT -->
+        <span [innerHTML]="question.statement"></span>
+    </div>
+    <div class="card-body">
+        <!-- ALTERNATIVES DISPLAY -->
+        <div class="list-group">
+            <button type="button" 
+            class="list-group-item list-group-item-action"
+            *ngFor="let alternative of question.alternatives; let iAlternative=index"
+            [ngClass]="{
+                'bg-light text-success fw-bold': iAlternative==question.answer
+            }">
+            <span [innerHTML]="alternative"></span>
+            </button>
+        </div>
+    </div>
+    <div class="card-body mt-4">
+        <h6 class="display-6">Solução comentada</h6>
+        <span [innerHTML]="question.comment"></span>
+    </div>
+    
+    <div class="card-footer text-end" *ngIf="isEditable">
+        <button style="display: none;" 
+        type="button" 
+        data-bs-toggle="modal"
+        [attr.data-bs-target]="'#questionModal'+question._id" id="btnEditQuestionModal"></button>
+        <button class="btn btn-outline-primary btn-sm m-1" (click)="editQuestion(question)">
+            <i class="bi bi-pencil-square"></i> Editar
+        </button>
+
+<!--         <button class="btn btn-danger btn-sm m-1" 
+            (click)="removeQuestion(question._id)">
+            <i class="bi bi-trash"></i> Remover
+        </button> -->
+    </div>
+</div>
+
+  <!-- Editar questões -->
+  <div class="modal fade" [attr.id]="'questionModal'+question._id" tabindex="-1"
+  aria-labelledby="questionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 me-2" id="questionLabel">
+          <i class="bi bi-pencil-square"></i> Editar questão
+        </h1>
+      </div>
+      <div class="modal-body">
+          <p class="card-text fw-italic" *ngIf="question==null">
+              Não há questões para editar aqui.
+          </p>
+      </div>
+      <div class="modal-body p-4"  *ngIf="question">
+          <!-- Categorias -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-bookmark"></i> Categorias</h3>
+              <form>
+                  <div class="input-group mb-4">
+                      <input type="text" class="form-control border border-2" 
+                      aria-label="Adicione uma category" aria-describedby="btncategoryAddNew"
+                      autosize name="category" id="category" #categoryInput>
+                      <button class="btn btn-primary" type="button"
+                      (click)="question.categories.push(categoryInput.value)"
+                      id="btncategoryAddNew"><i class="bi bi-plus-circle"></i></button>                                
+                  </div>
+              </form>
+              <form *ngFor="let category of question.categories; let iCategories=index">
+                  <div class="input-group mb-1">
+                      
+                      <input type="text" class="form-control bg-light" 
+                      aria-label="Recipient's username" aria-describedby="btncategoryRemoveNew"
+                      autosize name="{{'category'+question._id}}" 
+                      id="{{'category'+question._id}}" 
+                      [ngModel]="question.categories[iCategories]">
+  
+                      <button class="btn btn-outline-danger" type="button"
+                      (click)="question.categories.splice(iCategories, 1)"
+                      id="btncategoryRemoveNew"><i class="bi bi-trash"></i></button>
+                  </div>
+              </form>
+          </span>
+          <!-- Enunciado da questão -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-question-circle"></i> Enunciado</h3>
+              <form *ngIf="question">
+                  <quill-editor class="form-control border-0 mb-2" 
+                  name="{{'statement'+question._id}}" id="{{'statement'+question._id}}"
+                  [(ngModel)]="question.statement"></quill-editor>
+              </form>
+          </span>
+          <!-- Alternativas -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-check-circle"></i> Alternativas</h3>
+              <form>
+                  <div class="mb-4 text-center">
+                      <quill-editor name="newAlternative" class="form-control border-0 mb-2"
+                      [(ngModel)]="newAlternative"></quill-editor>
+  
+                      <button class="btn btn-primary form-control border-0 mb-2" type="button"
+                      (click)="question.alternatives.push(newAlternative)"
+                      id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
+                      <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
+  
+                      
+                  </div>
+                  <div class="mb-2" *ngFor="let alternative of question.alternatives; trackBy: trackByQuestionId; let iAlt=index">
+                      <quill-editor class="form-control border-0 mb-2" 
+                      name="{{'question'+question._id+'alt'+'-'+iAlt}}"
+                      id="{{'question'+question._id+'alt'+'-'+iAlt}}"
+                      [(ngModel)]="question.alternatives[iAlt]"
+                      ></quill-editor>
+                      
+                      <span class="row">
+                          <div class="col-6">
+                              
+                              <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
+                              [ngClass]="{'text-success':question.answer==iAlt, 'text-danger':question.answer!=iAlt}"
+                              (click)="question.answer=iAlt">
+  
+                              <span *ngIf="question.answer==iAlt">
+                                  <i class="bi bi-check-circle"></i> <br> Correto
+                              </span>
+                              <span *ngIf="question.answer!=iAlt">
+                                  <i class="bi bi-x-circle"></i> <br> Incorreto
+                              </span>
+                              
+                          </button>
+                          </div>
+                          <div class="col-6">
+                              <button class="btn btn-outline-danger form-control" type="button"
+                              (click)="question.alternatives.splice(iAlt, 1)"
+                              id="btnAlternativeRemove"><i class="bi bi-trash"></i> <br> Remover</button>
+                          </div>
+                      </span>
+                  </div>
+              </form>
+          </span>
+          <!-- Solução comentada -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-check-circle-fill"></i> Solução comentada</h3>
+              <form>
+                  <quill-editor class="form-control border-0 mb-2" 
+                  name="{{'comment'+question._id}}" id="{{'comment'+question._id}}"
+                  [(ngModel)]="question.comment"></quill-editor>
+              </form>
+          </span>
+      </div>
+      <div class="card-footer text-end pb-2">
+          <button class="btn btn-light btn-sm m-1" 
+          type="button" data-bs-dismiss="modal">Sair</button>
+<!--           <button class="btn btn-primary btn-sm m-1" 
+          *ngIf="question"
+          (click)="updateQuestion(question)"
+          type="button" data-bs-dismiss="modal">Finalizar edição</button> -->
+      </div>
+    </div>
+  </div>
+  </div>

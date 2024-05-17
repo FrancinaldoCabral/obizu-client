@@ -7,6 +7,7 @@ import { SocketService } from '../services/socket.service'
 import { QuestionService } from '../services/question.service'
 import { NgxSpinnerService } from 'ngx-spinner'
 import { ToastrService } from 'ngx-toastr'
+import { QuestionComponent } from '../question/question.component'
 
 @Component({
   selector: 'app-questions-edit',
@@ -14,7 +15,8 @@ import { ToastrService } from 'ngx-toastr'
   imports: [
     CommonModule,
     FormsModule,
-    QuillModule
+    QuillModule,
+    QuestionComponent
   ],
   providers: [
 //    SocketService,
@@ -29,7 +31,7 @@ export class QuestionsEditComponent implements OnInit {
   pageSize: number = 10
   totalItems: number = 0
 
-  edit: boolean[] = []
+  editQuestion: any = null
 
   newAlternative: string = ''
 
@@ -42,7 +44,6 @@ export class QuestionsEditComponent implements OnInit {
     this.socketService.getConnecSource$.subscribe(
       connect => {
           if(connect){
-            console.log('socket in edit component')
             this.loadData()
           }else{
             this.ngxSpinner.hide('question-ia-generator')
@@ -65,15 +66,38 @@ export class QuestionsEditComponent implements OnInit {
     })
   }
 
-  mapIndexOfEdits(): number {
-    return this.edit.filter((qEdited:boolean)=>{return qEdited==true})
-    .map((result:boolean, index:number)=> index)[0]
+  removeQuestion(_id:any): void {
+    this.ngxSpinner.show()
+    this.questionService.deleteQuestionsInDB(_id).subscribe(
+      success => {
+        console.log(success)
+        this.ngxSpinner.hide()
+        this.loadData()
+        this.toastr.success(`Questão atualizada com sucesso.`)
+        this.editQuestion = null
+      },
+      error => {
+        this.toastr.error(`Erro na atualização da questão.`)
+        this.ngxSpinner.hide()
+      }
+    )
   }
 
-
-
-  removeQuestion(_id:any): void {
-
+  updateQuestion(question: any): void {
+    this.ngxSpinner.show()
+    this.questionService.updateQuestionsInDB([question]).subscribe(
+      success => {
+        console.log(success)
+        this.ngxSpinner.hide()
+        this.loadData()
+        this.toastr.success(`Questão atualizada com sucesso.`)
+        this.editQuestion = null
+      },
+      error => {
+        this.toastr.error(`Erro na atualização da questão.`)
+        this.ngxSpinner.hide()
+      }
+    )
   }
 
   loadData() {

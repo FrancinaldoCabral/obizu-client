@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { EnvironmentService } from './environment.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,10 @@ export class AuthService {
   private authenticate = new BehaviorSubject<boolean>(false)
   user: any = null
   lembrarMe: boolean = false
-  
+
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private env: EnvironmentService
   ) { }
 
   changeLembrarMe(): void {
@@ -74,6 +76,10 @@ export class AuthService {
                   this.setUser(userUpdate)
                   this.setAuthenticate(true)
                   resolve(true)
+                },
+                error => {
+                  console.log(error)
+                  rejects(false)
                 }
               )
             }else{
@@ -99,12 +105,12 @@ export class AuthService {
     this.authenticate.next(false)
     window.localStorage.clear()
     //this.router.navigate(['login'])
-    window.location.href = 'https://redatudo.online/wp-json/api/v1/logout'
+    window.location.href = `${this.env.wpUrl}/wp-json/api/v1/logout`
     this.login()
   }
 
   isValidate(token: string): Observable<any> {
-    return this.http.post('https://redatudo.online/wp-json/jwt-auth/v1/token/validate', {}, {
+    return this.http.post(`${this.env.wpUrl}/wp-json/jwt-auth/v1/token/validate`, {}, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -112,7 +118,7 @@ export class AuthService {
   }
 
   me(token: string): Observable<any> {
-    return this.http.get('https://redatudo.online/wp-json/api/v1/me', {
+    return this.http.get(`${this.env.wpUrl}/wp-json/api/v1/me`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -120,7 +126,7 @@ export class AuthService {
   }
 
   getSubscription(token: string): Observable<any>{
-    return this.http.get(`https://redatudo.online/wp-json/api/v1/subscription`, {
+    return this.http.get(`${this.env.wpUrl}/wp-json/api/v1/subscription`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

@@ -37,12 +37,20 @@
                 <div class="card mb-4 animate__animated animate__fadeIn" 
                 *ngFor="let question of questions; let iQuestions=index">
                     <div class="card-header">
-                        #{{iQuestions+1}} 
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                            id="{{'check'+iQuestions}}" name="{{'check'+iQuestions}}"
+                            [checked]="questionsSelecteds[iQuestions]==true"
+                            (click)="selectQuestion(iQuestions)">
+                            <label class="form-check-label" for="{{'check'+iQuestions}}">
+                                #{{iQuestions+1}} 
+                            </label>
+                        </div>
                     </div>
                     <div class="card-body">
                         <!-- Categorias -->
                         <span>
-                            <span class="badge rounded-pill text-bg-light m-1" 
+                            <span class="badge rounded-pill text-bg-light mb-4 me-1" 
                                 *ngFor="let tag of question.categories">
                                 {{decodificarSequenciasUnicode(tag)}}
                             </span>
@@ -70,7 +78,7 @@
                     <div class="card-footer text-end">
                         <button class="btn btn-outline-primary btn-sm m-1" 
                         type="button" 
-                        (click)="edit[iQuestions]=true"
+                        (click)="indexEdit=iQuestions"
                         data-bs-toggle="modal" data-bs-target="#editQuestion">
                         <i class="bi bi-pencil-square"></i> Editar</button>
      
@@ -87,9 +95,21 @@
         </div>
     </div>
 
-    <br><br>
+    <br><br><br><br><br><br>
     <div class="row mt-4">
         <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-bottom justify-content-center">
+            <form class="d-flex" role="button">
+                    <select name="model" id="model"
+                    class="form-control m-1"
+                    aria-describedby="modelHelp"
+                    (change)="onOptionChange($event)">
+                        <option *ngFor="let m of models; let i=index" 
+                            [value]="m" 
+                            [selected]="m == model">
+                            {{m}}
+                        </option>
+                    </select>
+            </form>
             <div class="btn-group dropup">
                 <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-robot"></i> Criar
@@ -103,6 +123,12 @@
                     <li>
                         <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#createFromTextModal">
                             <i class="bi bi-body-text"></i> A partir de texto puro
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item cursor"
+                            (click)="replicateQuestions()">
+                            <i class="bi bi-repeat"></i> Replicar selecionadas ({{getSelecteds().length}})
                         </a>
                     </li>
                     <li>
@@ -140,23 +166,9 @@
           </h1>
         </div>
         <div class="modal-body">
+            <span class="badge bg-light mb-2">{{model}}</span>
             <span>
                 <form class="form">
-                    <div class="mb-2">
-                        <label for="model" class="form-label">
-                            Modelo - Do mais barato para o mais caro.
-                        </label>
-                        <select name="model" id="model"
-                        class="form-control"
-                        aria-describedby="modelHelp"
-                        (change)="onOptionChange($event)">
-                        <option *ngFor="let m of models; let i=index" 
-                            [value]="m" 
-                            [selected]="m == model">
-                            {{m}}
-                        </option>
-                        </select>
-                    </div>
                     <div class="mb-2">
                         <label for="codProva" class="form-label">CONCURSO</label>
                         <input class="form-control form-control-sm" required
@@ -215,23 +227,9 @@
           </h1>
         </div>
         <div class="modal-body">
+            <span class="badge bg-light mb-2">{{model}}</span>
             <span>
                 <form #formTypeText="ngForm" (blur)="saveFormQuestionByText()">
-                    <div class="mb-2">
-                        <label for="model" class="form-label">
-                            Modelo - Do mais barato para o mais caro.
-                        </label>
-                        <select name="model" id="model"
-                        class="form-control"
-                        aria-describedby="modelHelp"
-                        (change)="onOptionChange($event)">
-                        <option *ngFor="let m of models; let i=index" 
-                            [value]="m" 
-                            [selected]="m == model">
-                            {{m}}
-                        </option>
-                        </select>
-                    </div>
                     <div class="mb-2">
                         <label for="codProva" class="form-label">CONCURSO</label>
                         <input class="form-control form-control-sm" required
@@ -287,15 +285,15 @@
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5 me-2" id="editQuestionLabel">
-            <i class="bi bi-pencil-square"></i> Editar questão
+            <i class="bi bi-pencil-square"></i> Editar questão {{indexEdit+1}}
           </h1>
         </div>
         <div class="modal-body">
-            <p class="card-text fw-italic" *ngIf="!edit[mapIndexOfEdits()]">
+            <p class="card-text fw-italic" *ngIf="indexEdit==null">
                 Não há questões para editar aqui.
             </p>
         </div>
-        <div class="modal-body p-4"  *ngIf="edit[mapIndexOfEdits()]">
+        <div class="modal-body p-4" *ngIf="indexEdit!=null">
             <!-- Categorias -->
             <span class="p-1 m-2">
                 <h3><i class="bi bi-bookmark"></i> Categorias</h3>
@@ -305,21 +303,21 @@
                         aria-label="Adicione uma tag" aria-describedby="btnTagAddNew"
                         autosize name="tag" id="tag" #tagInput>
                         <button class="btn btn-primary" type="button"
-                        (click)="questions[mapIndexOfEdits()].categories.push(tagInput.value)"
+                        (click)="questions[indexEdit].categories.push(tagInput.value)"
                         id="btnTagAddNew"><i class="bi bi-plus-circle"></i></button>                                
                     </div>
                 </form>
-                <form *ngFor="let tag of questions[mapIndexOfEdits()]?.categories; let iCategories=index">
+                <form *ngFor="let tag of questions[indexEdit]?.categories; let iCategories=index">
                     <div class="input-group mb-1">
                         
                         <input type="text" class="form-control bg-light" 
                         aria-label="Recipient's username" aria-describedby="btnTagRemoveNew"
-                        autosize name="{{'tag'+mapIndexOfEdits()}}" 
-                        id="{{'tag'+mapIndexOfEdits()}}" 
-                        [ngModel]="questions[mapIndexOfEdits()].categories[iCategories]">
+                        autosize name="{{'tag'+indexEdit}}" 
+                        id="{{'tag'+indexEdit}}" 
+                        [ngModel]="questions[indexEdit].categories[iCategories]">
     
                         <button class="btn btn-outline-danger" type="button"
-                        (click)="questions[mapIndexOfEdits()].categories.splice(iCategories, 1)"
+                        (click)="questions[indexEdit].categories.splice(iCategories, 1)"
                         id="btnTagRemoveNew"><i class="bi bi-trash"></i></button>
                     </div>
                 </form>
@@ -327,11 +325,11 @@
             <!-- Enunciado da questão -->
             <span class="p-1 m-2">
                 <h3><i class="bi bi-question-circle"></i> Enunciado</h3>
-                <form *ngIf="edit.length>0">
+                <form *ngIf="indexEdit!=null">
                     <quill-editor class="form-control border-0 mb-2" 
                     (blur)="saveQuestionsInLocalStorage()"
-                    name="{{'statement'+mapIndexOfEdits()}}" id="{{'statement'+mapIndexOfEdits()}}"
-                    [(ngModel)]="questions[mapIndexOfEdits()].statement"></quill-editor>
+                    name="{{'statement'+indexEdit}}" id="{{'statement'+indexEdit}}"
+                    [(ngModel)]="questions[indexEdit].statement"></quill-editor>
                 </form>
             </span>
             <!-- Alternativas -->
@@ -343,30 +341,30 @@
                         [(ngModel)]="newAlternative"></quill-editor>
 
                         <button class="btn btn-primary form-control border-0 mb-2" type="button"
-                        (click)="questions[mapIndexOfEdits()].alternatives.push(newAlternative)"
+                        (click)="questions[indexEdit].alternatives.push(newAlternative)"
                         id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
                         <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
 
                         
                     </div>
-                    <div class="mb-2" *ngFor="let alternative of questions[mapIndexOfEdits()].alternatives; trackBy: trackByQuestionId; let iAlt=index">
+                    <div class="mb-2" *ngFor="let alternative of questions[indexEdit].alternatives; trackBy: trackByQuestionId; let iAlt=index">
                         <quill-editor class="form-control border-0 mb-2" 
-                        name="{{'question'+mapIndexOfEdits()+'alt'+'-'+iAlt}}"
-                        id="{{'question'+mapIndexOfEdits()+'alt'+'-'+iAlt}}"
-                        [(ngModel)]="questions[mapIndexOfEdits()].alternatives[iAlt]"
+                        name="{{'question'+indexEdit+'alt'+'-'+iAlt}}"
+                        id="{{'question'+indexEdit+'alt'+'-'+iAlt}}"
+                        [(ngModel)]="questions[indexEdit].alternatives[iAlt]"
                         ></quill-editor>
                         
                         <span class="row">
                             <div class="col-6">
                                 
                                 <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
-                                [ngClass]="{'text-success':questions[mapIndexOfEdits()].answer==iAlt, 'text-danger':questions[mapIndexOfEdits()].answer!=iAlt}"
-                                (click)="questions[mapIndexOfEdits()].answer=iAlt; saveQuestionsInLocalStorage();">
+                                [ngClass]="{'text-success':questions[indexEdit].answer==iAlt, 'text-danger':questions[indexEdit].answer!=iAlt}"
+                                (click)="questions[indexEdit].answer=iAlt; saveQuestionsInLocalStorage();">
 
-                                <span *ngIf="questions[mapIndexOfEdits()].answer==iAlt">
+                                <span *ngIf="questions[indexEdit].answer==iAlt">
                                     <i class="bi bi-check-circle"></i> <br> Correto
                                 </span>
-                                <span *ngIf="questions[mapIndexOfEdits()].answer!=iAlt">
+                                <span *ngIf="questions[indexEdit].answer!=iAlt">
                                     <i class="bi bi-x-circle"></i> <br> Incorreto
                                 </span>
                                 
@@ -374,7 +372,7 @@
                             </div>
                             <div class="col-6">
                                 <button class="btn btn-outline-danger form-control" type="button"
-                                (click)="questions[mapIndexOfEdits()].alternatives.splice(iAlt, 1); saveQuestionsInLocalStorage();"
+                                (click)="questions[indexEdit].alternatives.splice(iAlt, 1); saveQuestionsInLocalStorage();"
                                 id="btnAlternativeRemove"><i class="bi bi-trash"></i> <br> Remover</button>
                             </div>
                         </span>
@@ -387,18 +385,18 @@
                 <form>
                     <quill-editor class="form-control border-0 mb-2" 
                     (blur)="saveQuestionsInLocalStorage()"
-                    name="{{'comment'+mapIndexOfEdits()}}" id="{{'comment'+mapIndexOfEdits()}}"
-                    [(ngModel)]="questions[mapIndexOfEdits()].comment"></quill-editor>
+                    name="{{'comment'+indexEdit}}" id="{{'comment'+indexEdit}}"
+                    [(ngModel)]="questions[indexEdit].comment"></quill-editor>
                 </form>
             </span>
         </div>
         <div class="card-footer text-end pb-2">
             <button class="btn btn-light btn-sm m-1" 
             type="button" data-bs-dismiss="modal"
-            (click)="edit[mapIndexOfEdits()]=false;">Sair</button>
+            (click)="indexEdit=null;">Sair</button>
             <button class="btn btn-primary btn-sm m-1" 
-            *ngIf="edit[mapIndexOfEdits()]"
-            (click)="edit[mapIndexOfEdits()]=false; saveQuestionsInLocalStorage();"
+            *ngIf="indexEdit!=null"
+            (click)="indexEdit=null; saveQuestionsInLocalStorage();"
             type="button" data-bs-dismiss="modal">Finalizar edição</button>
         </div>
       </div>

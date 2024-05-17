@@ -1,4 +1,4 @@
-<nav class="navbar bg-transparent fixed-top">
+<nav class="navbar bg-transparent fixed-top mb-4">
     <div class="container-fluid">
       <button class="navbar-toggler text-start" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -21,14 +21,19 @@
                 Questões
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" routerLink="">Criar</a></li>
-                <li><a class="dropdown-item" routerLink="edit">Editar</a></li>
+                <li><a class="dropdown-item" routerLink="new">Criar</a></li>
+                <li><a class="dropdown-item" routerLink="">Editar</a></li>
               </ul>
             </li>
           </ul>
           <form class="d-flex" role="button">
-            <button class="btn btn-success m-1" type="button" >
-                <i class="bi bi-save"></i> Entrar
+            <button class="btn btn-outline-danger m-1" 
+              type="button" *ngIf="isConnected()"
+              (click)="logout()">
+                <i class="bi bi-save"></i> Sair
+            </button>
+            <button class="btn btn-primary m-1" type="button" *ngIf="!isConnected()">
+              <i class="bi bi-save"></i> Entrar
             </button>
           </form>
         </div>

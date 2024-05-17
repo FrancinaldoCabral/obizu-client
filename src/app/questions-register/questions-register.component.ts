@@ -58,6 +58,10 @@ export class QuestionsRegisterComponent {
 
   newAlternative:any=''
 
+  indexEdit:any = null
+
+  questionsSelecteds: any[]=[]
+
   constructor(
     private questionService: QuestionService,
     private toastrService: ToastrService,
@@ -227,6 +231,19 @@ export class QuestionsRegisterComponent {
     }
   }
 
+  selectQuestion(iQuestions: number): void {
+    this.questionsSelecteds[iQuestions]=!this.questionsSelecteds[iQuestions]
+    console.log(this.questionsSelecteds)
+  }
+
+  getSelecteds(): any[]{
+      const indices = this.questionsSelecteds.map((q:any, i:number)=> i )
+      const questionsSelecteds = this.questions.filter((q:any, i:number)=> { return indices.includes(i) })
+      return questionsSelecteds
+  }
+
+  
+
   saveQuestionsInLocalStorage(): void {
     window.localStorage.setItem('questions', JSON.stringify(this.questions))
   }
@@ -317,6 +334,27 @@ export class QuestionsRegisterComponent {
     formData.append('editalText', this.editalText)
 
     this.questionService.createQuestions(formData, this.model, 'text').subscribe(
+      (response) => {
+        this.toastrService.success('Gerando questões...')
+      },
+      (error) => {
+        this.toastrService.error('Erro na geração de questões.')
+        this.ngxSpinner.hide('question-ia-generator')
+      }
+    )
+  }
+
+  replicateQuestions(): void {
+    this.ngxSpinner.show('question-ia-generator')
+    const questions = this.getSelecteds()
+    console.log(questions)
+    if(questions.length==0) {
+      this.ngxSpinner.hide('question-ia-generator')
+      this.toastrService.info('Selecione questões.')
+      return
+    }
+    
+    this.questionService.createQuestions({ questions }, this.model, 'replic').subscribe(
       (response) => {
         this.toastrService.success('Gerando questões...')
       },

@@ -8,6 +8,7 @@ import { TokenInterceptor } from './services/token.interceptor'
 import { LoginComponent } from './login/login.component'
 import { QuestionService } from './services/question.service'
 import { NavbarComponent } from './navbar/navbar.component'
+import { EnvironmentService } from './services/environment.service'
 
 //declare var hljs: any
 
@@ -27,6 +28,7 @@ import { NavbarComponent } from './navbar/navbar.component'
     AuthService,
     SocketService,
     QuestionService,
+    EnvironmentService,
     {
       provide: HTTP_INTERCEPTORS, 
       useClass: TokenInterceptor, 
