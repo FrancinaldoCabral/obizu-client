@@ -146,6 +146,7 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
                 </div>
             </form>
             <form *ngFor="let category of editQuestion?.categories; let iCategories=index">
+                <span class="badge bg-light m-1">{{category}} <i class="bi bi-trash" (click)="editQuestion.categories.splice(iCategories, 1)"></i></span>
                 <div class="input-group mb-1">
                     
                     <input type="text" class="form-control bg-light" 
