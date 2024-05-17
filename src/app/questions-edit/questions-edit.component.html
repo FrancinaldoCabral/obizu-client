@@ -152,7 +152,7 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
                     aria-label="Recipient's username" aria-describedby="btncategoryRemoveNew"
                     autosize name="{{'category'+editQuestion._id}}" 
                     id="{{'category'+editQuestion._id}}" 
-                    [ngModel]="editQuestion.categories[iCategories]">
+                    [(ngModel)]="editQuestion.categories[iCategories]">
 
                     <button class="btn btn-outline-danger" type="button"
                     (click)="editQuestion.categories.splice(iCategories, 1)"
