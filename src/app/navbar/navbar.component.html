@@ -1,7 +1,8 @@
-<nav class="navbar navbar-expand-lg bg-transparent fixed-top mb-4">
+<nav class="navbar navbar-expand-lg bg-white fixed-top mb-4">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
-      <img class="img-fluid" src="assets/img/obizu-logotype-rect.png" alt="">
+      <img class="img-fluid" width="143px" height="73"
+      src="assets/img/obizu-logotype-rect-fundo-branco.png" alt="">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -23,12 +24,12 @@
         </li>
       </ul>
       <form class="d-flex" role="button">
-        <button class="btn btn-outline-danger m-1" 
+        <button class="btn btn-outline-danger btn-sm m-1" 
           type="button" *ngIf="isConnected()"
           (click)="logout()">
             <i class="bi bi-save"></i> Sair
         </button>
-        <button class="btn btn-primary m-1" type="button" *ngIf="!isConnected()">
+        <button class="btn btn-primary btn-sm m-1" type="button" *ngIf="!isConnected()">
           <i class="bi bi-save"></i> Entrar
         </button>
       </form>

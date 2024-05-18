@@ -67,6 +67,7 @@ export class SocketService {
 
     this.socket.on("connect_error", (err) => {
       // the reason of the error, for example "xhr poll error"
+      this.ngxSpinner.hide('ia-creator')
       this.toastr.warning('Falha de conexão.', 'Connection')
 
     })
