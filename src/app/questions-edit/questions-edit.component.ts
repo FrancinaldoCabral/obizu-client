@@ -35,6 +35,8 @@ export class QuestionsEditComponent implements OnInit {
 
   newAlternative: string = ''
 
+  coustTotal:number = 0
+
   constructor(
     private questionService: QuestionService,
     private ngxSpinner: NgxSpinnerService,
@@ -45,6 +47,7 @@ export class QuestionsEditComponent implements OnInit {
       connect => {
           if(connect){
             this.loadData()
+            this.loadCoust()
           }else{
             this.ngxSpinner.hide('question-ia-generator')
           }
@@ -53,7 +56,10 @@ export class QuestionsEditComponent implements OnInit {
   }
   
   ngOnInit(): void {
-    if(this.socketService.getSocketIsConnect()) this.loadData()
+    if(this.socketService.getSocketIsConnect()) {
+      this.loadData()
+      this.loadCoust()
+    }
   }
 
   trackByQuestionId(index: number, question: any): any {
@@ -108,6 +114,20 @@ export class QuestionsEditComponent implements OnInit {
         this.questions = data.items
         this.totalItems = data.totalItems
         this.ngxSpinner.hide()
+      },
+      error=> {
+        console.log(error)
+        this.ngxSpinner.hide()
+        this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
+      },
+      ()=> this.ngxSpinner.hide())
+  }
+
+  loadCoust() {
+    this.questionService.getCousts().subscribe(
+      data => {
+        console.log(data)
+        this.coustTotal = data.coustTotal
       },
       error=> {
         console.log(error)

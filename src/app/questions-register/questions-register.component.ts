@@ -1,9 +1,9 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { QuestionService } from '../services/question.service'
 import { FormsModule } from '@angular/forms'
 import { ToastrService } from 'ngx-toastr'
 import { SocketService } from '../services/socket.service'
-import { NgxSpinnerService } from 'ngx-spinner'
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { QuillModule } from 'ngx-quill'
@@ -14,16 +14,18 @@ import { QuillModule } from 'ngx-quill'
   imports: [
     CommonModule,
     FormsModule,
-    QuillModule
+    QuillModule,
+    NgxSpinnerModule
   ],
   providers: [
     //SocketService,
-    QuestionService
+    QuestionService,
+    NgxSpinnerService
   ],
   templateUrl: './questions-register.component.html',
   styleUrl: './questions-register.component.css'
 })
-export class QuestionsRegisterComponent {
+export class QuestionsRegisterComponent implements OnInit{
   models: string [] = ['claude-3-haiku-20240307', 'claude-3-sonnet-20240229', 'claude-3-opus-20240229']
   model: string = 'claude-3-haiku-20240307' || window.localStorage.getItem('model')
   codProva:string = ''
@@ -62,6 +64,11 @@ export class QuestionsRegisterComponent {
 
   questionsSelecteds: any[]=[]
 
+  status: string = ''
+  jobId: string = ''
+
+  contentToQuestions: string = ''
+
   constructor(
     private questionService: QuestionService,
     private toastrService: ToastrService,
@@ -86,29 +93,25 @@ export class QuestionsRegisterComponent {
               this.saveQuestionsInLocalStorage()
               this.saveCredits()
 
-              this.ngxSpinner.hide('question-ia-generator')
-          }
-
-          if(status.toLowerCase()=='failed'){
-              this.ngxSpinner.hide('question-ia-generator')
+              this.ngxSpinner.hide('ia-creator')
+          }else if(status.toLowerCase()=='failed'){
+              this.ngxSpinner.hide('ia-creator')
+              this.status=''
+              this.jobId=''
               this.toastrService.error(`Erro na criação de questões.`)
+          }else if(status.toLowerCase()=='active'){
+            this.status = 'Iniciando...'
+          }else{
+            this.status = status
           }
       },
       error => {
-          this.ngxSpinner.hide('question-ia-generator')
+          this.ngxSpinner.hide('ia-creator')
+          this.status=''
+          this.jobId=''
           console.log('socket service getResultSource error: ', error)
           this.toastrService.error(`Erro de conexão.`)
       }
-    )
-
-    this.socketService.getConnecSource$.subscribe(
-        connect => {
-            if(connect){
-                //this.fetchFiles()
-            }else{
-              this.ngxSpinner.hide('question-ia-generator')
-            }
-        }
     )
 
     this.loadQuestions()
@@ -117,51 +120,15 @@ export class QuestionsRegisterComponent {
     this.loadFormQuestionManual()
     this.loadModel()
   }
+  ngOnInit(): void {
+
+  }
   
 
   trackByQuestionId(index: number, question: any): any {
     return index; // Suponha que cada pergunta tem uma propriedade 'id' única
   }
-  
-
-/*   resposeReceive(): void {
-    this.socketService.getResultSource$.subscribe(
-      response => {
-          const { status, job } = response
-          if(status.toLowerCase()=='completed'){ 
-              const { result } = response        
-              const { credits, questions } = result
-              this.credits = credits
-              this.totalCredits += credits
-         
-              questions.forEach((question:any) => {
-                this.questions.unshift(question)
-              })
-
-              this.saveQuestionsInLocalStorage()
-              this.saveCredits()
-
-              this.ngxSpinner.hide('question-ia-generator')
-          }
-
-          if(status.toLowerCase()=='failed'){
-              this.ngxSpinner.hide('question-ia-generator')
-          }
-      },
-      error => {
-          console.log('socket service getResultSource error: ', error)
-      }
-    )
-
-    this.socketService.getConnecSource$.subscribe(
-        connect => {
-            if(connect){
-                //this.fetchFiles()
-            }
-        }
-    )
-  } */
-
+ 
   saveCredits(): void {
     window.localStorage.setItem('credits', JSON.stringify(this.credits))
     window.localStorage.setItem('total_credits', JSON.stringify(this.totalCredits))
@@ -177,14 +144,14 @@ export class QuestionsRegisterComponent {
   }
 
   loadFormQuestionByText(): void {
-    if(window.localStorage.getItem('provaText')){
-      this.provaText = window.localStorage.getItem('provaText') as string
+    if(window.localStorage.getItem('contentToQuestions')){
+      this.contentToQuestions = window.localStorage.getItem('contentToQuestions') as string
     }
-    if(window.localStorage.getItem('gabaritoText')){
-      this.gabaritoText = window.localStorage.getItem('gabaritoText') as string
+    if(window.localStorage.getItem('codProva')){
+      this.codProva = window.localStorage.getItem('codProva') as string
     }
-    if(window.localStorage.getItem('editalText')){
-      this.editalText = window.localStorage.getItem('editalText') as string
+    if(window.localStorage.getItem('qtdeQuestions')){
+      this.qtdeQuestions = parseInt(window.localStorage.getItem('qtdeQuestions') as any)
     }
   }
 
@@ -211,9 +178,9 @@ export class QuestionsRegisterComponent {
   }
 
   saveFormQuestionByText(): void {
-    window.localStorage.setItem('provaText', this.provaText)
-    window.localStorage.setItem('gabaritoText', this.gabaritoText)
-    window.localStorage.setItem('editalText', this.editalText)
+    window.localStorage.setItem('contentToQuestions', this.contentToQuestions)
+    window.localStorage.setItem('codProva', this.codProva)
+    window.localStorage.setItem('qtdeQuestions', this.qtdeQuestions.toString())
   }
 
   onOptionChange(event: any): void {
@@ -242,8 +209,6 @@ export class QuestionsRegisterComponent {
       return questionsSelecteds
   }
 
-  
-
   saveQuestionsInLocalStorage(): void {
     window.localStorage.setItem('questions', JSON.stringify(this.questions))
   }
@@ -266,14 +231,16 @@ export class QuestionsRegisterComponent {
   }
 
   async addNewQuestion(): Promise<void> {
-    this.ngxSpinner.show('question-manual-generator')
+    this.status = `Criação manual...`
+    this.ngxSpinner.show('ia-creator')
     this.questions.unshift(this.newQuestion)
     const awaitMoment = await new Promise(resolve=>{setTimeout(() => {
       this.toastrService.success('Questão adicionada com sucesso')
       this.saveFormQuestionManual()
       this.saveQuestionsInLocalStorage()
-      this.ngxSpinner.hide('question-manual-generator')
+      this.ngxSpinner.hide('ia-creator')
       this.saveQuestionsInLocalStorage()
+      this.status = ``
       resolve(true)
     }, 1000)})
   }
@@ -294,73 +261,99 @@ export class QuestionsRegisterComponent {
   }
 
   questionsCreateWithPdf(): void {
-    this.ngxSpinner.show('question-ia-generator')
+    this.status = `Criando a partir de pdf. Modelo ${this.model}`
+    this.ngxSpinner.show('ia-creator')
 
     if(!this.codProva || !this.provaFile) {
-      this.ngxSpinner.hide('question-ia-generator')
+      this.status = ''
+      this.ngxSpinner.hide('ia-creator')
       return
     }
 
     const formData: FormData = new FormData()
     formData.append('codProva', this.codProva)
+    formData.append('qtdeQuestions', this.qtdeQuestions.toString())
     formData.append('provaFile', this.provaFile, this.provaFile.name)
     formData.append('gabaritoFile', this.gabaritoFile, this.gabaritoFile.name)
     formData.append('editalFile', this.editalFile, this.editalFile.name)
 
     this.questionService.createQuestions(formData, this.model, 'pdf').subscribe(
       (response) => {
-        this.toastrService.success('Gerando questões...')
+        this.jobId = response.id
       },
       (error) => {
         this.toastrService.error('Erro na geração de questões.')
-        this.ngxSpinner.hide('question-ia-generator')
+        this.jobId = ''
+        this.status = ''
+        this.ngxSpinner.hide('ia-creator')
       }
     )
   }
 
   questionsCreateWithPureText(): void {
-    this.ngxSpinner.show('question-ia-generator')
+    this.status = `Criando a partir de textos. Modelo ${this.model}`
+    this.ngxSpinner.show('ia-creator')
+    
     this.saveFormQuestionByText()
 
-    if(!this.codProva || !this.provaText) {
-      this.ngxSpinner.hide('question-ia-generator')
+    if(!this.codProva || !this.qtdeQuestions || !this.contentToQuestions) {
+      this.ngxSpinner.hide('ia-creator')
+      this.toastrService.info('Concurso, Qtde de questões e o conteúdo são necessários.')
       return
     }
 
     const formData: FormData = new FormData()
     formData.append('codProva', this.codProva)
-    formData.append('provaText', this.provaText)
-    formData.append('gabaritoText', this.gabaritoText)
-    formData.append('editalText', this.editalText)
+    formData.append('qtdeQuestions', this.qtdeQuestions.toString())
+    formData.append('contentToQuestions', this.contentToQuestions)
 
     this.questionService.createQuestions(formData, this.model, 'text').subscribe(
       (response) => {
-        this.toastrService.success('Gerando questões...')
+        this.jobId = response.id
       },
       (error) => {
         this.toastrService.error('Erro na geração de questões.')
-        this.ngxSpinner.hide('question-ia-generator')
+        this.status = ''
+        this.jobId = ''
+        this.ngxSpinner.hide('ia-creator')
       }
     )
   }
 
   replicateQuestions(): void {
-    this.ngxSpinner.show('question-ia-generator')
+    this.ngxSpinner.show('ia-creator')
+    this.status = `Replicando questões. Modelo ${this.model}`
     const questions = this.getSelecteds()
     console.log(questions)
     if(questions.length==0) {
-      this.ngxSpinner.hide('question-ia-generator')
+      this.ngxSpinner.hide('ia-creator')
       this.toastrService.info('Selecione questões.')
       return
     }
     
     this.questionService.createQuestions({ questions }, this.model, 'replic').subscribe(
       (response) => {
-        this.toastrService.success('Gerando questões...')
+        this.jobId = response.id
       },
       (error) => {
         this.toastrService.error('Erro na geração de questões.')
-        this.ngxSpinner.hide('question-ia-generator')
+        this.jobId = ''
+        this.status = ''
+        this.ngxSpinner.hide('ia-creator')
+      }
+    )
+  }
+
+  cancelCreator(id:string): void {
+    console.log('cancelarrrrrr')
+    this.questionService.cancelCreation(id).subscribe(
+      success => {
+        this.status = 'Cancelando...'
+        console.log('enviado cancelamento', success)
+      },
+      error => {
+        this.toastrService.show('Não foi possível cancelar.')
+        console.log(error)
       }
     )
   }

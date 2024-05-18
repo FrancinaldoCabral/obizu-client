@@ -4,6 +4,7 @@ import { Subject } from 'rxjs'
 import { AuthService } from './auth.service'
 import { ToastrService } from 'ngx-toastr'
 import { EnvironmentService } from './environment.service'
+import { NgxSpinnerService } from 'ngx-spinner'
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,8 @@ export class SocketService {
   constructor(
     private auth: AuthService,
     private toastr: ToastrService,
-    private env: EnvironmentService
+    private env: EnvironmentService,
+    private ngxSpinner: NgxSpinnerService
   ) { 
 
   }
@@ -51,8 +53,10 @@ export class SocketService {
     this.socket.on('disconnect', ()=>{ 
       console.log('socket id: ', this.socket?.id) 
       this.socketIsConnect = false
+      this.ngxSpinner.hide('ia-creator')
       this.toastr.warning('You is disconnect', 'Connection')
     })
+    
     this.socket.on('results', (result)=>{
       console.log(result)
       this.resultSource.next(result)
@@ -63,7 +67,7 @@ export class SocketService {
 
     this.socket.on("connect_error", (err) => {
       // the reason of the error, for example "xhr poll error"
-      console.log('Socket error',err);
+      this.toastr.warning('Falha de conexão.', 'Connection')
 
     })
   }

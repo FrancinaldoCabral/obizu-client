@@ -30,6 +30,14 @@ export class QuestionService {
     })
   }
 
+  cancelCreation(id:string): Observable<any> {
+    return this.http.delete(`${this.env.apiUrl}/job/cancel/${id}`, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
   replicQuestions(formData: any, model:string, type:string): Observable<any> {
     return this.http.post(`${this.env.apiUrl}/api/create?model=${model}&type=${type}`, formData, {
       headers: new HttpHeaders({
@@ -68,6 +76,14 @@ export class QuestionService {
         page: currentPage.toString(),
         pageSize: pageSize.toString()
       },
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  getCousts(): Observable<any>{
+    return this.http.get<any>(`${this.env.apiUrl}/api/cousts`, {
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`
       })

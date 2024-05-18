@@ -169,11 +169,21 @@
             <span class="badge bg-light mb-2">{{model}}</span>
             <span>
                 <form class="form">
-                    <div class="mb-2">
-                        <label for="codProva" class="form-label">CONCURSO</label>
-                        <input class="form-control form-control-sm" required
-                            placeholder="Ex.: CFSD, CBFN"
-                            id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <label for="codProva" class="form-label">CONCURSO</label>
+                                <input class="form-control form-control-sm" required
+                                    placeholder="Ex.: CFSD, CBFN"
+                                    id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <label for="qtdeQestions" class="form-label">Quantas questões?</label>
+                                <input type="number" name="qtdeQuestions" class="form-control form-control-sm" [(ngModel)]="qtdeQuestions">
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-2">
                         <label for="provaFile" class="form-label">Prova .pdf</label>
@@ -230,13 +240,27 @@
             <span class="badge bg-light mb-2">{{model}}</span>
             <span>
                 <form #formTypeText="ngForm" (blur)="saveFormQuestionByText()">
-                    <div class="mb-2">
-                        <label for="codProva" class="form-label">CONCURSO</label>
-                        <input class="form-control form-control-sm" required
-                            placeholder="Ex.: CFSD, CBFN"
-                            id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <label for="codProva" class="form-label">CONCURSO</label>
+                                <input class="form-control form-control-sm" required
+                                    placeholder="Ex.: CFSD, CBFN"
+                                    id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <label for="qtdeQestions" class="form-label">Quantas questões?</label>
+                                <input type="number" name="qtdeQuestions" class="form-control form-control-sm" [(ngModel)]="qtdeQuestions">
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-2">
+                    <quill-editor class="form-control border-0 mb-2" 
+                    (blur)="saveQuestionsInLocalStorage()"
+                    name="contentToQuestions" id="contentToQuestions"
+                    [(ngModel)]="contentToQuestions"></quill-editor>
+<!--                     <div class="mb-2">
                         <label for="provaText" class="form-label">Prova ou questões da prova</label>
                         <textarea autosize class="form-control form-control-lg" rows="3" maxlength="20000" required
                             id="provaText" name="provaText" [(ngModel)]="provaText"></textarea>
@@ -250,7 +274,7 @@
                         <label for="editalText" class="form-label">Edital</label>
                         <textarea class="form-control form-control-lg" rows="3" maxlength="20000" 
                             id="editalText" name="editalText" [(ngModel)]="editalText"></textarea>
-                    </div>
+                    </div> -->
                 </form>
                 <div class="alert alert-secondary mt-4" role="alert">
                     <h6>
@@ -269,7 +293,7 @@
         <div class="card-footer text-center pt-2">
             <button #closeBtn type="button" class="btn btn-outline-dark mb-2" data-bs-dismiss="modal">Sair</button>
             <button type="button" class="btn btn-dark mb-2 ms-1"
-                [disabled]="!provaText"
+                [disabled]="!contentToQuestions"
                 (click)="questionsCreateWithPureText()">
                 <span *ngIf="!uploadSpinner"><i class="bi bi-body-text"></i> Criar questões com IA (texto)</span>
             </button>
@@ -519,3 +543,17 @@
       </div>
     </div>
 </div>
+
+
+<ngx-spinner name="ia-creator" bdColor="rgba(0, 0, 0, 0.8)" size ="medium" color="#fff" type="ball-atom" [fullScreen] = "true">
+    <br><br><br>
+    <p class="text-white mt-4 mb-4 pt-4">
+      {{status}} 
+    </p>
+    <form *ngIf="jobId!=''">
+        <div class="row justify-content-center text-center">
+            <button class="btn btn-outline-danger btn-sm form-control col-2"
+            (click)="cancelCreator(jobId)">Cancelar</button>
+        </div>
+    </form>
+</ngx-spinner>
