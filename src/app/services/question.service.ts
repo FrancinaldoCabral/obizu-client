@@ -82,6 +82,14 @@ export class QuestionService {
     })
   }
 
+  getQuestionsInFailed(): Observable<any>{
+    return this.http.get<any[]>(`${this.env.apiUrl}/api/get-json`, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
   getCousts(): Observable<any>{
     return this.http.get<any>(`${this.env.apiUrl}/api/cousts`, {
       headers: new HttpHeaders({

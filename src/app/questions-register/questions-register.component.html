@@ -1,13 +1,27 @@
 <div class="container pt-4 mt-4">
     <div class="row pt-4 align-items-center">
-        <div class="col pb-4">
-            <span *ngIf="questions.length==0" class="text-center text-muted mt-4 fw-italic">
+        <div class="col pb-4 pt-4">
+            
+            <div class="row">
+                <div class="col-6 text-start">
+                    <p class="text-muted mt-4 text-start">Seu custo total com IA: ${{coustTotal | number:'1.2-2'}} dólares</p>
+                    <a class="cursor" (click)="toggleSelectAll()">Selecionar tudo ({{selectedItems.size}})</a>
+                </div>
+                <div class="col-6 text-end text-warning" *ngIf="!getSocketIsConnected()">
+                    <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    Conectando...
+                </div>
+            </div> 
+
+            <span *ngIf="questions.length==0" class="text-center text-muted pt-4 fw-italic">
                 <br><br><br>
                 <div class="alert alert-light" role="alert">
                     <p><em>Crie questões e em seguida salve no banco de dados.</em></p>
                     <div class="btn-group dropup">
                         <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-robot"></i> Criar com IA
+                            <i class="bi bi-robot"></i> Ações
                         </button>
                         <ul class="dropdown-menu">
                             <li>
@@ -22,6 +36,32 @@
                                     <i class="bi bi-pencil"></i> Criar questão (manual)
                                 </a>
                             </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item cursor"
+                                    (click)="openFiles()">
+                                    <i class="bi bi-upload"></i> Fazer upload de questões
+                                </a>
+                            </li>
+                            <li *ngIf="questionsInFailed.length>0">
+                                <a class="dropdown-item cursor text-danger"
+                                    (click)="downloadQuestionsInFailed()">
+                                    Últimas falhas ({{questionsInFailed.length}})
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li *ngIf="getCopiedQuestions().length>0">
+                                <a class="dropdown-item cursor"
+                                    (click)="pasteQuestions()">
+                                    <i class="bi bi-clipboard-fill"></i> Colar ({{getCopiedQuestions().length}})
+                                </a>
+                            </li>
+                            <li *ngIf="getCopiedQuestions().length>0">
+                                <a class="dropdown-item cursor"
+                                    (click)="clearCopiedQuestions()">
+                                    Limpar área de transferencia ({{getCopiedQuestions().length}})
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -32,15 +72,25 @@
                 <div class="card mb-4 animate__animated animate__fadeIn" 
                 *ngFor="let question of questions; let iQuestions=index">
                     <div class="card-header">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" 
-                            id="{{'check'+iQuestions}}" name="{{'check'+iQuestions}}"
-                            [checked]="questionsSelecteds[iQuestions]==true"
-                            (click)="selectQuestion(iQuestions)">
-                            <label class="form-check-label" for="{{'check'+iQuestions}}">
-                                #{{iQuestions+1}} 
-                            </label>
+                        <div class="row">
+                            <div class="col-6 text-start">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                    id="{{'check'+iQuestions}}" name="{{'check'+iQuestions}}"
+                                    [checked]="selectedItems.has(question.id)"
+                                    (click)="toggleSelection(question)">
+                                    <label class="form-check-label" for="{{'check'+iQuestions}}">
+                                        #{{iQuestions+1}} 
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6 text-end">
+                                <button class="btn btn-light border-0" (click)="copyOneQuestion(question)">
+                                    <i class="bi bi-clipboard"></i> Copiar
+                                </button>
+                            </div>
                         </div>
+
                     </div>
                     <div class="card-body">
                         <!-- Categorias -->
@@ -98,7 +148,7 @@
                     class="form-control m-1"
                     aria-describedby="modelHelp"
                     (change)="onOptionChange($event)">
-                        <option *ngFor="let m of models; let i=index" 
+                        <option *ngFor="let m of models; let i=index" [disabled]="disabledModels.includes(m)"
                             [value]="m" 
                             [selected]="m == model">
                             {{m}}
@@ -107,37 +157,82 @@
             </form>
             <div class="btn-group dropup">
                 <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-robot"></i> Criar
+                    <i class="bi bi-robot"></i> Ações
                 </button>
                 <ul class="dropdown-menu">
-                    <li>
-                        <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#createFromTextModal">
-                            <i class="bi bi-body-text"></i> A partir de texto puro
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item cursor"
-                            (click)="replicateQuestions()">
-                            <i class="bi bi-repeat"></i> Replicar selecionadas ({{getSelecteds().length}})
-                        </a>
-                    </li>
                     <li>
                         <a class="dropdown-item cursor" data-bs-toggle="modal" 
                         (click)="clearNewQuestion()"
                         data-bs-target="#newQuestionModal">
-                            <i class="bi bi-pencil"></i> Criar questão (manual)
+                            <i class="bi bi-pencil"></i> Criar questão MANUALMENTE
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item cursor" data-bs-toggle="modal" data-bs-target="#createFromTextModal">
+                            <i class="bi bi-body-text"></i> A partir de texto com IA
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item cursor"
+                            data-bs-toggle="modal" data-bs-target="#replicatedFromSelecteds">
+                            <i class="bi bi-repeat"></i> Replicar selecionadas com IA ({{selectedItems.size}})
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item cursor"
+                            (click)="downloadQuestionsSelecteds()">
+                            <i class="bi bi-download"></i> Baixar selecionadas ({{selectedItems.size}})
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item cursor"
+                            (click)="openFiles()">
+                            <i class="bi bi-upload"></i> Fazer upload de questões
+                        </a>
+                    </li>
+                    <li *ngIf="questionsInFailed.length>0">
+                        <a class="dropdown-item cursor text-danger"
+                            (click)="downloadQuestionsInFailed()">
+                            Últimas falhas ({{questionsInFailed.length}})
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item cursor"
+                            (click)="copyQuestions()">
+                            <i class="bi bi-clipboard"></i> Copiar selecionadas ({{selectedItems.size}})
+                        </a>
+                    </li>
+                    <li *ngIf="getCopiedQuestions().length>0">
+                        <a class="dropdown-item cursor"
+                            (click)="pasteQuestions()">
+                            <i class="bi bi-clipboard-fill"></i> Colar ({{getCopiedQuestions().length}})
+                        </a>
+                    </li>
+                    <li *ngIf="getCopiedQuestions().length>0">
+                        <a class="dropdown-item cursor"
+                            (click)="clearCopiedQuestions()">
+                            Limpar área de transferencia ({{getCopiedQuestions().length}})
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item cursor"
+                            (click)="toggleSelectAll()">
+                            Selecionar tudo ({{selectedItems.size}})
                         </a>
                     </li>
                 </ul>
             </div>
             <form class="d-flex" role="button">
-                <button class="btn btn-outline-danger m-1" type="button" [disabled]="questions.length==0"
-                    (click)="removeAll()">
-                    <i class="bi bi-trash"></i> Remover tudo
+                <button class="btn btn-outline-danger m-1" type="button" [disabled]="selectedItems.size==0"
+                    (click)="removeSelectedItems()">
+                    <i class="bi bi-trash"></i> Remover seleção ({{selectedItems.size}})
                 </button>
-                <button class="btn btn-outline-success m-1" type="button" [disabled]="questions.length==0"
-                    (click)="saveQuestionsInDB(questions)">
-                    <i class="bi bi-save"></i> Salvar tudo
+                <button class="btn btn-outline-success m-1" type="button" [disabled]="selectedItems.size==0"
+                    (click)="saveQuestionsInDB(getSelecteds())">
+                    <i class="bi bi-save"></i> Salvar seleção ({{selectedItems.size}})
                 </button>
             </form>
         </nav>
@@ -250,21 +345,6 @@
                     (blur)="saveQuestionsInLocalStorage()"
                     name="contentToQuestions" id="contentToQuestions"
                     [(ngModel)]="contentToQuestions"></quill-editor>
-<!--                     <div class="mb-2">
-                        <label for="provaText" class="form-label">Prova ou questões da prova</label>
-                        <textarea autosize class="form-control form-control-lg" rows="3" maxlength="20000" required
-                            id="provaText" name="provaText" [(ngModel)]="provaText"></textarea>
-                    </div>
-                    <div class="mb-2">
-                        <label for="gabaritoText" class="form-label">Gabarito</label>
-                        <textarea class="form-control form-control-lg" rows="3" maxlength="20000" 
-                            id="gabaritoText" name="gabaritoText" [(ngModel)]="gabaritoText"></textarea>
-                    </div>
-                    <div class="mb-2">
-                        <label for="editalText" class="form-label">Edital</label>
-                        <textarea class="form-control form-control-lg" rows="3" maxlength="20000" 
-                            id="editalText" name="editalText" [(ngModel)]="editalText"></textarea>
-                    </div> -->
                 </form>
                 <div class="alert alert-secondary mt-4" role="alert">
                     <h6>
@@ -284,8 +364,63 @@
             <button #closeBtn type="button" class="btn btn-outline-dark mb-2" data-bs-dismiss="modal">Sair</button>
             <button type="button" class="btn btn-dark mb-2 ms-1"
                 [disabled]="!contentToQuestions"
-                (click)="questionsCreateWithPureText()">
+                (click)="extractionQuestionsByParts()">
                 <span *ngIf="!uploadSpinner"><i class="bi bi-body-text"></i> Criar questões com IA (texto)</span>
+            </button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Replicar questões selecionadas -->
+<div class="modal fade" id="replicatedFromSelecteds" tabindex="-1" 
+    aria-labelledby="replicatedFromSelectedsLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5 me-2" id="replicatedFromSelectedsLabel">
+            <i class="bi bi-body-text"></i> Replicar questões selecionadas ({{selectedItems.size}})
+          </h1>
+        </div>
+        <div class="modal-body">
+            <span class="badge bg-light mb-2">{{model}}</span>
+            <span>
+                <form #formTypeText="ngForm" (blur)="saveFormReplic()">
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="mb-2">
+                                <label for="qtdeQestions" class="form-label">Quantas réplicas para cada questão selecionada?</label>
+                                <input type="number" name="qtdeQuestions" class="form-control form-control-sm" [(ngModel)]="qtdeQuestions">
+                            </div>
+                        </div>
+                    </div>
+                    <h6>Escreva mais instruções. <small class="text-muted">(opcional)</small></h6>
+                    <quill-editor class="form-control border-0 mb-2" 
+                    (blur)="saveFormReplic()"
+                    name="othersInstructions" id="othersInstructions"
+                    [(ngModel)]="othersInstructions"></quill-editor>
+
+                </form>
+                <div class="alert alert-secondary mt-4" role="alert">
+                    <h6>
+                        Custos com IA
+                    </h6>
+                    <p>
+                        ${{credits}} Custo da última geração neste dispositivo.
+                    </p>
+                    <p>
+                        ${{totalCredits}} Custo total das gerações atuais neste dispositivo.
+                    </p>
+                    <button class="btn btn-light btn-sm" (click)="resetCredits()">Reset</button>
+                </div>
+            </span>
+        </div>
+        <div class="card-footer text-center pt-2">
+            <button #closeBtn type="button" class="btn btn-outline-dark mb-2" data-bs-dismiss="modal">Sair</button>
+            <button type="button" class="btn btn-dark mb-2 ms-1"
+                [disabled]="selectedItems.size==0"
+                (click)="replicateQuestionsByParts()">
+                <span *ngIf="!uploadSpinner"><i class="bi bi-repeat"></i> Replicar questões com IA</span>
             </button>
         </div>
       </div>
@@ -534,6 +669,9 @@
     </div>
 </div>
 
+<form>
+    <input #questionsJson type="file" id="uploadQuestions" style="display: none;" (input)="onFileSelected($event); questionsJson.value=''" accept=".json">
+</form>
 
 <ngx-spinner name="ia-creator" bdColor="rgba(0, 0, 0, 0.8)" size ="medium" color="#fff" type="ball-atom" [fullScreen] = "true">
     <br><br><br>
@@ -546,4 +684,11 @@
             (click)="cancelCreator(jobId)">Cancelar</button>
         </div>
     </form>
+</ngx-spinner>
+
+<ngx-spinner class="mb-2" name="transactional"
+bdColor="rgba(0, 0, 0, 0.8)" size ="medium" color="#fff" type="ball-atom" [fullScreen] = "true"
+>
+<!-- <p class="text-secondary mt-2">Loading...</p> -->
+Aguarde...
 </ngx-spinner>

@@ -13,11 +13,17 @@ export class SocketService {
 
   socket!: Socket
   
-  private resultSource = new Subject<any>()
-  getResultSource$ = this.resultSource.asObservable()
+  private resultSourceExtraction = new Subject<any>()
+  getResultSourceExtraction$ = this.resultSourceExtraction.asObservable()
 
   private connectSource = new Subject<any>()
   getConnecSource$ = this.connectSource.asObservable()
+
+  private statusSource = new Subject<any>()
+  getStatusSource$ = this.statusSource.asObservable()
+
+  private resultSourceReplicate = new Subject<any>()
+  getresultSourceReplicate$ = this.resultSourceReplicate.asObservable()
 
   socketIsConnect: boolean = false
 
@@ -50,6 +56,7 @@ export class SocketService {
       this.connectSource.next(true)
       //this.toastr.success('You is connected', 'Connection')
     })
+
     this.socket.on('disconnect', ()=>{ 
       console.log('socket id: ', this.socket?.id) 
       this.socketIsConnect = false
@@ -57,20 +64,42 @@ export class SocketService {
       this.toastr.warning('You is disconnect', 'Connection')
     })
     
-    this.socket.on('results', (result)=>{
+    this.socket.on('extraction', (result)=>{
       console.log(result)
-      this.resultSource.next(result)
+      this.resultSourceExtraction.next(result)
     })
+
+    this.socket.on('replicate', (result)=>{
+      console.log(result)
+      this.resultSourceReplicate.next(result)
+    })
+
+    this.socket.on('status', (result)=>{
+      console.log(result)
+      this.statusSource.next(result)
+    })
+    
     this.socket.on('failed', (result)=>{
       console.log('failed')
     })
 
     this.socket.on("connect_error", (err) => {
       // the reason of the error, for example "xhr poll error"
+      this.socketIsConnect = false
       this.ngxSpinner.hide('ia-creator')
       this.toastr.warning('Falha de conexão.', 'Connection')
 
     })
+  }
+
+  emitReplicate(form:any): void {
+    this.socket.emit('replicate', form)
+    this.toastr.info('Enviado. Aguarde...')
+  }
+
+  emitExtraction(form:any): void {
+    this.socket.emit('extraction', form)
+    this.toastr.info('Enviado. Aguarde...')
   }
 
   getSocketIsConnect(): boolean {

@@ -4,9 +4,11 @@ import { FormsModule } from '@angular/forms'
 import { ToastrService } from 'ngx-toastr'
 import { SocketService } from '../services/socket.service'
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
-import { CommonModule } from '@angular/common'
-import { HttpClientModule } from '@angular/common/http'
+import { CommonModule, DecimalPipe } from '@angular/common'
 import { QuillModule } from 'ngx-quill'
+
+import { v4 as uuidv4 } from 'uuid'
+import { AuthService } from '../services/auth.service'
 
 @Component({
   selector: 'app-questions-register',
@@ -20,14 +22,23 @@ import { QuillModule } from 'ngx-quill'
   providers: [
     //SocketService,
     QuestionService,
-    NgxSpinnerService
+    NgxSpinnerService,
+    DecimalPipe
   ],
   templateUrl: './questions-register.component.html',
   styleUrl: './questions-register.component.css'
 })
 export class QuestionsRegisterComponent implements OnInit{
-  models: string [] = ['claude-3-haiku-20240307', 'claude-3-sonnet-20240229', 'claude-3-opus-20240229']
-  model: string = 'claude-3-haiku-20240307' || window.localStorage.getItem('model')
+  models: string [] = [
+    'claude-3-haiku-20240307',
+    'gpt-3.5-turbo-0125',
+    'claude-3-sonnet-20240229',
+    'gpt-4o',
+    'gpt-4-turbo', 
+    'claude-3-opus-20240229'
+  ]
+  disabledModels: string [] = ['claude-3-sonnet-20240229', 'claude-3-haiku-20240307']
+  model: string = 'gpt-4o' || window.localStorage.getItem('model')
   codProva:string = ''
   qtdeQuestions:number = 0
 
@@ -48,7 +59,11 @@ export class QuestionsRegisterComponent implements OnInit{
   totalCredits: number = 0 
   questions: any[] = []
 
-  selectedQuestions: number[] = []
+  coustTotal: number = 0
+
+  selectedItems: Set<number> = new Set<number>()
+
+  questionsInFailed: any[]=[]
 
   newQuestion: any = {
     categories: [],
@@ -68,65 +83,137 @@ export class QuestionsRegisterComponent implements OnInit{
   jobId: string = ''
 
   contentToQuestions: string = ''
+  othersInstructions: string = ''
 
   constructor(
     private questionService: QuestionService,
     private toastrService: ToastrService,
     private socketService: SocketService,
-    private ngxSpinner: NgxSpinnerService
+    private ngxSpinner: NgxSpinnerService,
+    private auth: AuthService
   ){
-    this.socketService.getResultSource$.subscribe(
-      response => {
-          const { status, job } = response
-          if(status.toLowerCase()=='completed'){ 
-              const { result } = response        
-              console.log('result in component: ', result)
-              const { credits, questions } = result
-              this.toastrService.success(`${questions.length} questões criadas.`)
-              this.credits = credits
-              this.totalCredits += credits
-         
-              questions.forEach((question:any) => {
-                this.questions.unshift(question)
-              })
-
-              this.saveQuestionsInLocalStorage()
-              this.saveCredits()
-
-              this.ngxSpinner.hide('ia-creator')
-          }else if(status.toLowerCase()=='failed'){
-              this.ngxSpinner.hide('ia-creator')
-              this.status=''
-              this.jobId=''
-              this.toastrService.error(`Erro na criação de questões.`)
-          }else if(status.toLowerCase()=='active'){
-            this.status = 'Iniciando...'
+    this.socketService.getConnecSource$.subscribe(
+      connect => {
+          if(connect){
+            this.loadCoust()
           }else{
-            this.status = status
+            this.ngxSpinner.hide('question-ia-generator')
           }
+      }
+    )
+    this.socketService.getresultSourceReplicate$.subscribe(
+      response => {
+        const { credits, questions } = response
+        this.toastrService.success(`${questions.length} questões criadas.`)
+        this.credits = credits
+        this.totalCredits += credits
+   
+        questions.forEach((question:any) => {
+          if (!question.id) question.id = uuidv4()
+          this.questions.push(question)
+        })
+
+        this.saveQuestionsInLocalStorage()
+        this.saveCredits()
+        this.loadQuestionsInFailed()
+        this.loadCoust()
+        this.ngxSpinner.hide('ia-creator')
+
       },
       error => {
-          this.ngxSpinner.hide('ia-creator')
-          this.status=''
-          this.jobId=''
-          console.log('socket service getResultSource error: ', error)
-          this.toastrService.error(`Erro de conexão.`)
+        this.ngxSpinner.hide('ia-creator')
+        this.status=''
+        this.jobId=''
+        console.log('socket service getResultSource error: ', error)
+        this.toastrService.error(`Erro de conexão.`)
+      }
+    )
+    this.socketService.getResultSourceExtraction$.subscribe(
+      response => {
+        const { credits, questions } = response
+        this.toastrService.success(`${questions.length} questões criadas.`)
+        this.credits = credits
+        this.totalCredits += credits
+   
+        questions.forEach((question:any) => {
+          if (!question.id) question.id = uuidv4()
+          this.questions.push(question)
+        })
+
+        this.saveQuestionsInLocalStorage()
+        this.saveCredits()
+        this.loadQuestionsInFailed()
+        this.loadCoust()
+        this.ngxSpinner.hide('ia-creator')
+
+      },
+      error => {
+        this.ngxSpinner.hide('ia-creator')
+        this.status=''
+        this.jobId=''
+        console.log('socket service getResultSource error: ', error)
+        this.toastrService.error(`Erro de conexão.`)
       }
     )
 
+    this.socketService.getStatusSource$.subscribe(
+      response => {
+        const { status, job } = response
+        //this.jobId = job.id
+        this.status = status
+      },
+      error => {
+        //this.ngxSpinner.hide('ia-creator')
+        this.status=''
+        this.jobId=''
+        console.log('socket service getResultSource error: ', error)
+        this.toastrService.error(`Erro de conexão.`)
+      }
+    )
+
+    this.loadQuestionsInFailed()
     this.loadQuestions()
     this.loadCredits()
     this.loadFormQuestionByText()
     this.loadFormQuestionManual()
     this.loadModel()
   }
-  ngOnInit(): void {
 
+  ngOnInit(): void {
+    if(this.socketService.getSocketIsConnect()) {
+      this.loadCoust()
+    }
+  }
+
+  toggleSelection(item: any): void {
+    if (this.selectedItems.has(item.id)) {
+      this.selectedItems.delete(item.id);
+    } else {
+      this.selectedItems.add(item.id);
+    }
+  }
+
+  removeSelectedItems(): void {
+    this.questions = this.questions.filter(item => !this.selectedItems.has(item.id));
+    this.selectedItems.clear()
+    this.saveQuestionsInLocalStorage()
+  }
+
+  loadCoust() {
+    this.questionService.getCousts().subscribe(
+      data => {
+        console.log(data)
+        this.coustTotal = data.coustTotal
+      },
+      error=> {
+        console.log(error)
+        this.toastrService.error(`Erro no carregamento de custos. Erro: ${error.status}`)
+      }
+    )
   }
   
-
   trackByQuestionId(index: number, question: any): any {
-    return index; // Suponha que cada pergunta tem uma propriedade 'id' única
+    return index // Suponha que cada pergunta tem uma propriedade 'id' única
   }
  
   saveCredits(): void {
@@ -163,8 +250,27 @@ export class QuestionsRegisterComponent implements OnInit{
 
   loadQuestions(): void {
     if(window.localStorage.getItem('questions')){
-      this.questions = JSON.parse(window.localStorage.getItem('questions') as any)
+      const questions = JSON.parse(window.localStorage.getItem('questions') as any)
+      this.questions = questions.map((q:any, index:number)=>{
+        if(!q.id){
+          q.id = index
+          return q
+        }else{
+          return q
+        }
+      })
     }
+  }
+
+  loadQuestionsInFailed(): void {
+    this.questionService.getQuestionsInFailed().subscribe(
+      success => {
+        this.questionsInFailed = success
+      },
+      error => {
+        console.log(error)
+      }
+    )
   }
 
   loadModel(): void {
@@ -180,6 +286,11 @@ export class QuestionsRegisterComponent implements OnInit{
   saveFormQuestionByText(): void {
     window.localStorage.setItem('contentToQuestions', this.contentToQuestions)
     window.localStorage.setItem('codProva', this.codProva)
+    window.localStorage.setItem('qtdeQuestions', this.qtdeQuestions.toString())
+  }
+
+  saveFormReplic(): void {
+    window.localStorage.setItem('othersInstructions', this.othersInstructions)
     window.localStorage.setItem('qtdeQuestions', this.qtdeQuestions.toString())
   }
 
@@ -200,13 +311,11 @@ export class QuestionsRegisterComponent implements OnInit{
 
   selectQuestion(iQuestions: number): void {
     this.questionsSelecteds[iQuestions]=!this.questionsSelecteds[iQuestions]
-    console.log(this.questionsSelecteds)
+    console.log(this.getSelecteds())
   }
 
   getSelecteds(): any[]{
-      const indices = this.questionsSelecteds.map((q:any, i:number)=> i )
-      const questionsSelecteds = this.questions.filter((q:any, i:number)=> { return indices.includes(i) })
-      return questionsSelecteds
+      return this.questions.filter(item => this.selectedItems.has(item.id))
   }
 
   saveQuestionsInLocalStorage(): void {
@@ -216,12 +325,6 @@ export class QuestionsRegisterComponent implements OnInit{
   removeQuestion(index: number): void{
     this.questions.splice(index, 1)
     this.toastrService.success('Questão removida com sucesso.')
-    this.saveQuestionsInLocalStorage()
-  }
-
-  removeAll(): void {
-    this.toastrService.success(`${this.questions.length} questões removidas.`)
-    this.questions=[]
     this.saveQuestionsInLocalStorage()
   }
 
@@ -302,12 +405,14 @@ export class QuestionsRegisterComponent implements OnInit{
       return
     }
 
-    const formData: FormData = new FormData()
-    formData.append('codProva', this.codProva)
-    formData.append('qtdeQuestions', this.qtdeQuestions.toString())
-    formData.append('contentToQuestions', this.contentToQuestions)
+    const form = {     
+      model: this.model, 
+      codProva: this.codProva,
+      qtdeQuestions: this.qtdeQuestions,
+      contentToQuestions: this.contentToQuestions, 
+      metadata: { userId: this.auth.getUser().id } } 
 
-    this.questionService.createQuestions(formData, this.model, 'text').subscribe(
+    this.questionService.createQuestions(form, this.model, 'text').subscribe(
       (response) => {
         this.jobId = response.id
       },
@@ -323,7 +428,10 @@ export class QuestionsRegisterComponent implements OnInit{
   replicateQuestions(): void {
     this.ngxSpinner.show('ia-creator')
     this.status = `Replicando questões. Modelo ${this.model}`
+
     const questions = this.getSelecteds()
+    const qtdeQuestions = this.qtdeQuestions
+
     console.log(questions)
     if(questions.length==0) {
       this.ngxSpinner.hide('ia-creator')
@@ -331,7 +439,7 @@ export class QuestionsRegisterComponent implements OnInit{
       return
     }
     
-    this.questionService.createQuestions({ questions }, this.model, 'replic').subscribe(
+    this.questionService.createQuestions({ questions, qtdeQuestions }, this.model, 'replic').subscribe(
       (response) => {
         this.jobId = response.id
       },
@@ -342,6 +450,46 @@ export class QuestionsRegisterComponent implements OnInit{
         this.ngxSpinner.hide('ia-creator')
       }
     )
+  }
+
+  replicateQuestionsByParts(): void {
+    this.ngxSpinner.show('ia-creator')
+    this.status = `Replicando questões. Modelo ${this.model}`
+
+    if(this.getSelecteds().length==0) {
+      this.ngxSpinner.hide('ia-creator')
+      this.toastrService.info('Selecione questões.')
+      return
+    }
+
+    const form = {     
+      model: this.model, 
+      questionsOrigin: this.getSelecteds(),
+      qtdeQuestions: this.qtdeQuestions,
+      othersInstructions: this.othersInstructions, 
+      metadata: { userId: this.auth.getUser().id } }
+    
+    this.socketService.emitReplicate(form)
+  }
+
+  extractionQuestionsByParts(): void {
+    this.ngxSpinner.show('ia-creator')
+    this.status = `Replicando questões. Modelo ${this.model}`
+
+    if(this.getSelecteds().length==0) {
+      this.ngxSpinner.hide('ia-creator')
+      this.toastrService.info('Selecione questões.')
+      return
+    }
+
+    const form = {     
+      model: this.model, 
+      codProva: this.codProva,
+      qtdeQuestions: this.qtdeQuestions,
+      contentToQuestions: this.contentToQuestions, 
+      metadata: { userId:1 } }
+    
+    this.socketService.emitExtraction(form)
   }
 
   cancelCreator(id:string): void {
@@ -371,37 +519,180 @@ export class QuestionsRegisterComponent implements OnInit{
   }
 
   saveQuestionsInDB(questions: any[]): void {
-    this.ngxSpinner.show()
-    this.questionService.saveQuestionsInDB(questions).subscribe(
+    this.ngxSpinner.show('transactional')
+    const questionsWithoudIdTemp = questions.map((q:any)=>{
+      const { id, ...questionWithoudId } = q
+      return questionWithoudId
+    })
+    this.questionService.saveQuestionsInDB(questionsWithoudIdTemp).subscribe(
       (response) => {
         console.log(response)
         this.toastrService.success('Questões adicionadas no DB')
+        this.ngxSpinner.hide('transactional')
       },
       (error) => {
         console.log('save in db error', error)
         this.toastrService.error('Erro no registro de questões.')
-        this.ngxSpinner.hide()
+        this.ngxSpinner.hide('transactional')
       },
       () => {
-        this.ngxSpinner.hide()
+        this.ngxSpinner.hide('transactional')
       }
     )
   }
   saveOneQuestionInDB(question: any): void {
-    this.ngxSpinner.show()
-    this.questionService.saveQuestionsInDB([question]).subscribe(
+    this.ngxSpinner.show('transactional')
+    const { id, ...questionWithoutId } = question
+    this.questionService.saveQuestionsInDB([questionWithoutId]).subscribe(
       (response) => {
         console.log(response)
+        this.ngxSpinner.hide('transactional')
         this.toastrService.success(`1 questão adicionada no DB`)
       },
       (error) => {
         console.log('save in db error', error)
         this.toastrService.error('Erro no registro de questões.')
-        this.ngxSpinner.hide()
+        this.ngxSpinner.hide('transactional')
       },
       () => {
-        this.ngxSpinner.hide()
+        this.ngxSpinner.hide('transactional')
       }
     )
+  }
+
+  selectAll(): void {
+    this.questions.forEach(item => this.selectedItems.add(item.id));
+  }
+
+  deselectAll(): void {
+    this.selectedItems.clear();
+  }
+
+  toggleSelectAll(): void {
+    if (this.selectedItems.size === this.questions.length) {
+      this.deselectAll()
+    } else {
+      this.selectAll()
+    }
+  }
+
+  downloadQuestionsSelecteds(): void {
+    const questions = this.getSelecteds()
+    console.log(questions)
+    if(questions.length==0) {
+      this.ngxSpinner.hide('ia-creator')
+      this.toastrService.info('Selecione questões.')
+      return
+    }
+
+    const jsonStr = JSON.stringify(questions, null, 2) 
+    const blob = new Blob([jsonStr], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'questions.json'
+    a.click()
+
+    window.URL.revokeObjectURL(url)
+  }
+
+  downloadQuestionsInFailed(): void {
+    console.log(this.questionsInFailed)
+    if(this.questionsInFailed.length==0) {
+      this.ngxSpinner.hide('ia-creator')
+      this.toastrService.info('Selecione questões.')
+      return
+    }
+    const jsonStr = JSON.stringify(this.questionsInFailed, null, 2) 
+    const blob = new Blob([jsonStr], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'fail_questions.json'
+    a.click()
+
+    window.URL.revokeObjectURL(url)
+    this.ngxSpinner.hide('ia-creator')
+  }
+
+  openFiles(): void {
+    document.getElementById('uploadQuestions')?.click()
+  }
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0]
+    console.log(event.target.files[0])
+    if (file && file.type === 'application/json') {
+      console.log(file)
+      const reader = new FileReader()
+      reader.onload = (e: any) => {
+        try {
+          const uploadedJsonObject = JSON.parse(e.target.result)
+          uploadedJsonObject.forEach((question:any, i:number)=>{
+            if(!question.id) question.id = uuidv4()
+            this.questions.unshift(question)
+          })
+          this.saveQuestionsInLocalStorage()
+        } catch (error) {
+          this.toastrService.info('O arquivo deve ter um formato válido.')
+        }
+      }
+      reader.readAsText(file)
+    } else {
+      console.error('Please select a valid JSON file.')
+    }
+  }
+
+  copyQuestions(): void {
+    if(this.getSelecteds().length==0){
+      this.toastrService.info('Selecione questões para copiar.')
+      return 
+    }
+    const questions = this.getSelecteds()
+    window.localStorage.setItem('copiedQuestions', JSON.stringify(questions))
+    this.toastrService.info(`Pronto!`)
+  }
+
+  pasteQuestions(): void {
+    const questionsCopiedStorage = window.localStorage.getItem('copiedQuestions')
+    if(questionsCopiedStorage) {
+      const questions = JSON.parse(questionsCopiedStorage)
+      for (let index = 0; index < questions.length; index++) {
+        const question = questions[index]
+        if (!question.id) question.id = uuidv4()
+        this.questions.push(question)
+      }
+      this.saveQuestionsInLocalStorage()
+      window.localStorage.removeItem('copiedQuestions')
+      this.toastrService.info(`Pronto!`)
+    }else{
+      this.toastrService.info(`Não há questões para colar.`)
+      window.localStorage.removeItem('copiedQuestions')
+    }
+  }
+
+  getCopiedQuestions(): any[]{
+    const questionsCopiedStorage = window.localStorage.getItem('copiedQuestions') as any
+    if(questionsCopiedStorage){
+      return JSON.parse(questionsCopiedStorage)
+    } else{
+      return []
+    }
+  }
+
+  clearCopiedQuestions(): void {
+    window.localStorage.removeItem('copiedQuestions')
+    this.toastrService.info('Pronto!')
+  }
+
+  copyOneQuestion(question: any): void {
+    window.localStorage.setItem('copiedQuestions', JSON.stringify([question]))
+    this.toastrService.info(`Pronto!`)
+  }
+
+  getSocketIsConnected(): boolean {
+    return this.socketService.getSocketIsConnect()
   }
 }
