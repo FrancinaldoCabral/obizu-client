@@ -36,9 +36,7 @@ export class SocketService {
 
   }
 
-  setupSocketConnection(): void {
-    console.log('socket start')
-    
+  setupSocketConnection(): void { 
     this.socket = io(
       this.env.apiUrl, 
       //`https://209.145.57.84`,
@@ -48,6 +46,7 @@ export class SocketService {
           token: this.auth.getToken()
         }
       }
+
     )
 
     this.socket.on('connect', ()=>{ 
@@ -65,17 +64,14 @@ export class SocketService {
     })
     
     this.socket.on('extraction', (result)=>{
-      console.log(result)
       this.resultSourceExtraction.next(result)
     })
 
     this.socket.on('replicate', (result)=>{
-      console.log(result)
       this.resultSourceReplicate.next(result)
     })
 
     this.socket.on('status', (result)=>{
-      console.log(result)
       this.statusSource.next(result)
     })
     

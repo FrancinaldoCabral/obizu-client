@@ -33,7 +33,6 @@ export class LanguageService  {
     setLanguage(language:string): void {
         this.currentLanguage = language
         window.localStorage.setItem('language', language)
-        console.log(language)
     }
 
     getLanguage(): string {
@@ -50,6 +49,5 @@ export class LanguageService  {
 
     constructor(){
         this.currentLanguage = window.localStorage.getItem('language') || '🇵🇹 Portuguese (Brazilian)'
-        console.log(window.localStorage.getItem('language'))
     }
 }

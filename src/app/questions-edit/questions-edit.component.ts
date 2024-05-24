@@ -79,7 +79,6 @@ export class QuestionsEditComponent implements OnInit {
     this.ngxSpinner.show('transactional')
     this.questionService.deleteQuestionsInDB(_id).subscribe(
       success => {
-        console.log(success)
         this.ngxSpinner.hide('transactional')
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
@@ -96,7 +95,6 @@ export class QuestionsEditComponent implements OnInit {
     this.ngxSpinner.show('transactional')
     this.questionService.updateQuestionsInDB([question]).subscribe(
       success => {
-        console.log(success)
         this.ngxSpinner.hide('transactional')
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
@@ -113,7 +111,6 @@ export class QuestionsEditComponent implements OnInit {
     this.ngxSpinner.show('transactional')
     this.questionService.getQuestionsInDB(this.currentPage, this.pageSize).subscribe(
       data => {
-        console.log(data)
         this.questions = data.items
         this.totalItems = data.totalItems
         this.ngxSpinner.hide('transactional')
@@ -129,7 +126,6 @@ export class QuestionsEditComponent implements OnInit {
   loadCoust() {
     this.questionService.getCousts().subscribe(
       data => {
-        console.log(data)
         this.coustTotal = data.coustTotal
       },
       error=> {

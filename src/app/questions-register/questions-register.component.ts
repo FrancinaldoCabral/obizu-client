@@ -124,7 +124,6 @@ export class QuestionsRegisterComponent implements OnInit{
         this.ngxSpinner.hide('ia-creator')
         this.status=''
         this.jobId=''
-        console.log('socket service getResultSource error: ', error)
         this.toastrService.error(`Erro de conexão.`)
       }
     )
@@ -202,7 +201,6 @@ export class QuestionsRegisterComponent implements OnInit{
   loadCoust() {
     this.questionService.getCousts().subscribe(
       data => {
-        console.log(data)
         this.coustTotal = data.coustTotal
       },
       error=> {
@@ -311,7 +309,6 @@ export class QuestionsRegisterComponent implements OnInit{
 
   selectQuestion(iQuestions: number): void {
     this.questionsSelecteds[iQuestions]=!this.questionsSelecteds[iQuestions]
-    console.log(this.getSelecteds())
   }
 
   getSelecteds(): any[]{
@@ -432,7 +429,6 @@ export class QuestionsRegisterComponent implements OnInit{
     const questions = this.getSelecteds()
     const qtdeQuestions = this.qtdeQuestions
 
-    console.log(questions)
     if(questions.length==0) {
       this.ngxSpinner.hide('ia-creator')
       this.toastrService.info('Selecione questões.')
@@ -493,11 +489,9 @@ export class QuestionsRegisterComponent implements OnInit{
   }
 
   cancelCreator(id:string): void {
-    console.log('cancelarrrrrr')
     this.questionService.cancelCreation(id).subscribe(
       success => {
         this.status = 'Cancelando...'
-        console.log('enviado cancelamento', success)
       },
       error => {
         this.toastrService.show('Não foi possível cancelar.')
@@ -526,7 +520,6 @@ export class QuestionsRegisterComponent implements OnInit{
     })
     this.questionService.saveQuestionsInDB(questionsWithoudIdTemp).subscribe(
       (response) => {
-        console.log(response)
         this.toastrService.success('Questões adicionadas no DB')
         this.ngxSpinner.hide('transactional')
       },
@@ -545,7 +538,6 @@ export class QuestionsRegisterComponent implements OnInit{
     const { id, ...questionWithoutId } = question
     this.questionService.saveQuestionsInDB([questionWithoutId]).subscribe(
       (response) => {
-        console.log(response)
         this.ngxSpinner.hide('transactional')
         this.toastrService.success(`1 questão adicionada no DB`)
       },
@@ -578,7 +570,6 @@ export class QuestionsRegisterComponent implements OnInit{
 
   downloadQuestionsSelecteds(): void {
     const questions = this.getSelecteds()
-    console.log(questions)
     if(questions.length==0) {
       this.ngxSpinner.hide('ia-creator')
       this.toastrService.info('Selecione questões.')
@@ -598,7 +589,6 @@ export class QuestionsRegisterComponent implements OnInit{
   }
 
   downloadQuestionsInFailed(): void {
-    console.log(this.questionsInFailed)
     if(this.questionsInFailed.length==0) {
       this.ngxSpinner.hide('ia-creator')
       this.toastrService.info('Selecione questões.')
@@ -623,9 +613,7 @@ export class QuestionsRegisterComponent implements OnInit{
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0]
-    console.log(event.target.files[0])
     if (file && file.type === 'application/json') {
-      console.log(file)
       const reader = new FileReader()
       reader.onload = (e: any) => {
         try {
