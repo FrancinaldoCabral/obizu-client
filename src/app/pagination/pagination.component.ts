@@ -23,7 +23,7 @@ export class PaginationComponent {
   }
 
   setPageNumbers(): void {
-    const totalPagesToShow = 6;
+    const totalPagesToShow = 2;
     const halfRange = Math.floor(totalPagesToShow / 2);
     
     let startPage = Math.max(1, this.currentPage - halfRange);

@@ -11,7 +11,8 @@ export const routes: Routes = [
     { path:'admin/edit', title:'Admin - Questões', component: QuestionsEditComponent },
     { path:'admin/modules', title:'Admin - Módulos', component: ModuleAdminComponent },
     { 
-        path:'', title:'Módulos', component: ModulesComponent
+        path:'modules', title:'Módulos', component: ModulesComponent
     },
-    { path:':id', title:'Módulo', component: ModuleComponent },
+    { path:'modules/:id', title:'Módulo', component: ModuleComponent },
+    { path: '',   redirectTo: '/modules', pathMatch: 'full' }
 ]
