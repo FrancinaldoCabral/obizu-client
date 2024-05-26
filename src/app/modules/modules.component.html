@@ -1,0 +1,29 @@
+<br><br><br>
+<div class="container px-4 py-5" id="featured-3">
+    <h2 class="pb-2 border-bottom">Preparatórios</h2>
+    <form>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="searchModule" name="searchModule"
+            placeholder="Ex.: Soldado Fuzileiro Naval" [(ngModel)]="searchModule"
+            aria-label="Recipient's username" aria-describedby="basic-addon2">
+            <span class="input-group-text" id="basic-addon2"><i class="bi bi-search"></i></span>
+        </div>
+    </form>
+    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+      <div class="feature col shadow-sm pb-4" *ngFor="let module of getModules(); let i=index">
+        <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-transparent bg-gradient fs-2 mb-3">
+            <img src="{{module.imageUrl}}" alt="Ícone" width="50em" height="50em"/>
+        </div>          
+        <h5 class="fs-2 text-body-emphasis">{{module.title}}</h5>
+        <p>{{module.description}}</p>  
+        <button class="btn" btn-primary btn-sm icon-link
+            [ngClass]="{'btn-primary btn-sm icon-link':module.indices.length>0, 'btn-outline-primary btn-sm icon-link':module.indices.length===0}"
+            routerLink="{{module._id}}"
+            [disabled]="module.indices.length===0">
+            <span *ngIf="module.indices.length>0">Começar</span>
+            <span *ngIf="module.indices.length===0">Em breve</span>
+            <i class="bi bi-arrow-right-circle-fill ms-1"></i> 
+        </button> 
+      </div>
+    </div>
+</div>

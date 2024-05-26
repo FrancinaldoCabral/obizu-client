@@ -45,7 +45,8 @@ export class SocketService {
         auth: {
           token: this.auth.getToken()
         },
-        withCredentials: true
+        withCredentials: true,
+
       }
 
     )

@@ -97,4 +97,56 @@ export class QuestionService {
       })
     })
   }
+
+  getCategories(filters: string[]): Observable<any>{
+    return this.http.post<any>(`${this.env.apiUrl}/api/categories`, { filters }, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  getModules(currentPage:number, pageSize:number): Observable<any>{
+    return this.http.get<any[]>(`${this.env.apiUrl}/api/modules`, {
+      params: {
+        page: currentPage.toString(),
+        pageSize: pageSize.toString()
+      },
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  getOneModule(_id:any): Observable<any> {
+    return this.http.get(`${this.env.apiUrl}/api/modules/${_id}`,{
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  saveModule(newModule:any): Observable<any> {
+    return this.http.post(`${this.env.apiUrl}/api/modules`, { newModule }, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  deleteOneModule(_id:any): Observable<any> {
+    return this.http.delete(`${this.env.apiUrl}/api/modules/${_id}`,{
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  updateOneModule(module:any): Observable<any> {
+    return this.http.put(`${this.env.apiUrl}/api/modules`, module, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
 }

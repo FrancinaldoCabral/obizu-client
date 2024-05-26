@@ -29,4 +29,12 @@ export class NavbarComponent {
     return this.auth.getAuthenticate()
   }
 
+  isAdmin(): boolean {
+    return this.auth.getUser()?.role.includes('administrator') === true
+  }
+
+  getUserRole(): string {
+    return this.auth.getUser()?.role 
+  }
+
 }
