@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
 import { QuestionService } from '../services/question.service';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { SocketService } from '../services/socket.service';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../services/auth.service';
@@ -14,6 +14,7 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [
     CommonModule,
+    NgxSpinnerModule,
     RouterModule,
     FormsModule,
     QuillModule
@@ -194,6 +195,11 @@ export class ModuleAdminComponent {
 
   editModule(module:any): void {
     this.newModule = module
-    document.getElementById('newModuleBtn')?.click()
+    document.getElementById('newModuleModalBtn')?.click()
+  }
+
+  createNewModule(): void {
+    this.clearNewModule()
+    document.getElementById('newModuleModalBtn')?.click()
   }
 }

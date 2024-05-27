@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { ActivatedRoute, RouterModule } from '@angular/router'
 import { QuestionService } from '../services/question.service'
-import { NgxSpinnerService } from 'ngx-spinner'
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
 import { ToastrService } from 'ngx-toastr'
 import { CommonModule } from '@angular/common'
 import { SocketService } from '../services/socket.service'
@@ -11,24 +11,22 @@ import { SocketService } from '../services/socket.service'
   standalone: true,
   imports: [
     CommonModule,
+    NgxSpinnerModule,
     RouterModule
   ],
   templateUrl: './module.component.html',
   styleUrl: './module.component.css'
 })
 export class ModuleComponent implements OnInit {
-  
-  moduleId:string = ''
+  @Input() id!: string
   module: any
   
   constructor(
-    private activatedRoute: ActivatedRoute,
     private questionService: QuestionService,
     private ngxSpinner: NgxSpinnerService,
     private toastrService: ToastrService,
     private socketService: SocketService
   ){
-    this.moduleId = this.activatedRoute.snapshot.params['id']
     this.socketService.getConnecSource$.subscribe(
       (connect:any) => {
           if(connect){
@@ -41,7 +39,6 @@ export class ModuleComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.moduleId = this.activatedRoute.snapshot.params['id']
     if(this.socketService.getSocketIsConnect()) {
       this.loadData()
     }
@@ -49,10 +46,9 @@ export class ModuleComponent implements OnInit {
 
   loadData() {
     this.ngxSpinner.show('transactional')
-    this.questionService.getOneModule(this.moduleId).subscribe(
+    this.questionService.getOneModule(this.id).subscribe(
       data => {
         this.module = data
-        console.log(this.module)
         this.ngxSpinner.hide('transactional')
       },
       error=> {

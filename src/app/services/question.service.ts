@@ -82,6 +82,14 @@ export class QuestionService {
     })
   }
 
+  getOneQuestionInDB(_id: string): Observable<any>{
+    return this.http.get(`${this.env.apiUrl}/api/questions/${_id}`, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
   getQuestionsInFailed(): Observable<any>{
     return this.http.get<any[]>(`${this.env.apiUrl}/api/get-json`, {
       headers: new HttpHeaders({
@@ -144,6 +152,31 @@ export class QuestionService {
 
   updateOneModule(module:any): Observable<any> {
     return this.http.put(`${this.env.apiUrl}/api/modules`, module, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  randomQuestions(filters:string[]): Observable<any> {
+    return this.http.post(`${this.env.apiUrl}/api/random`, { filters }, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  respond(questionId:string, response:number): Observable<any> {
+    const createdAt = new Date()
+    return this.http.post(`${this.env.apiUrl}/api/respond`, { questionId, response, createdAt }, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  usersResponses(filters:string[]): Observable<any> {
+    return this.http.post(`${this.env.apiUrl}/api/responses`, { filters }, {
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`
       })

@@ -28,12 +28,12 @@ import { EnvironmentService } from './services/environment.service'
     AuthService,
     SocketService,
     QuestionService,
-    EnvironmentService,
-    {
+    EnvironmentService
+/*     {
       provide: HTTP_INTERCEPTORS, 
       useClass: TokenInterceptor, 
       multi: true
-    }
+    } */
   ]
 })
 export class AppComponent implements OnInit {

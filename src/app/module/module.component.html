@@ -28,12 +28,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let filter of module?.indices">
+                    <tr *ngFor="let indice of module?.indices">
                         <td class="text-start">
-                            {{filter.title}}
+                            {{indice.title}}
                         </td>
                         <td class="text-end">
-                            <button class="btn btn-outline-success">Começar</button>
+                            <button class="btn btn-outline-success"
+                            [routerLink]="['questions']" [queryParams]="{ filters: indice.filters }"
+                            >
+                              Começar
+                            </button>
                         </td>
                     </tr>
                 </tbody>
@@ -45,3 +49,10 @@
       </div>
     </div>
 </div>
+
+<ngx-spinner class="mb-2" name="transactional"
+bdColor="rgba(0, 0, 0, 0.8)" size ="medium" color="#fff" type="ball-atom" [fullScreen] = "true"
+>
+<!-- <p class="text-secondary mt-2">Loading...</p> -->
+Aguarde...
+</ngx-spinner>

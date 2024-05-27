@@ -1,6 +1,6 @@
-<br><br><br>
+
 <div class="container px-4 py-5" id="featured-3">
-    <h2 class="pb-2 border-bottom">Preparatórios</h2>
+    <h2 class="pb-2">Preparatórios</h2>
     <form>
         <div class="input-group mb-3">
             <input type="text" class="form-control" id="searchModule" name="searchModule"
@@ -10,7 +10,7 @@
         </div>
     </form>
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-      <div class="feature col shadow-sm pb-4" *ngFor="let module of getModules(); let i=index">
+      <div class="feature col shadow-sm pb-4 pt-2" *ngFor="let module of getModules(); let i=index">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-transparent bg-gradient fs-2 mb-3">
             <img src="{{module.imageUrl}}" alt="Ícone" width="50em" height="50em"/>
         </div>          
@@ -27,3 +27,10 @@
       </div>
     </div>
 </div>
+
+<ngx-spinner class="mb-2" name="transactional"
+bdColor="rgba(0, 0, 0, 0.8)" size ="medium" color="#fff" type="ball-atom" [fullScreen] = "true"
+>
+<!-- <p class="text-secondary mt-2">Loading...</p> -->
+Aguarde...
+</ngx-spinner>

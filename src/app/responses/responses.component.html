@@ -1,0 +1,32 @@
+<br>
+<div class="container mt-4 mb-4 pb-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h6>Respostas</h6>
+            <table class="table">
+                <tbody>
+                    <tr *ngFor="let response of responses">
+                        <td>{{response.createdAt | date:'fullDate'}}</td>
+                        <td>
+                            <span class="badge rounded-pill text-bg-light me-1" 
+                            *ngFor="let category of response.question?.categories">
+                            {{category}}
+                            </span>
+                        </td>
+                        <td>
+                            <span *ngIf="response.isCorrect" class="text-success">
+                                <i class="bi bi-check2-square"></i> Correto
+                            </span>
+                            <span *ngIf="!response.isCorrect" class="text-danger">
+                                <i class="bi bi-x-square"></i> Incorreto
+                            </span>
+                        </td>
+                        <td>
+                            <a [routerLink]="['/question', response.question._id]"><i class="bi bi-eye"></i> Ver questão</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

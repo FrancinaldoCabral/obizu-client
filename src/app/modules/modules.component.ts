@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { AuthService } from '../services/auth.service'
 import { QuillModule } from 'ngx-quill'
 import { QuestionService } from '../services/question.service'
-import { NgxSpinnerService } from 'ngx-spinner'
+import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner'
 import { SocketService } from '../services/socket.service'
 import { ToastrService } from 'ngx-toastr'
 import { RouterModule } from '@angular/router'
@@ -14,6 +14,7 @@ import { RouterModule } from '@angular/router'
   standalone: true,
   imports: [
     CommonModule,
+    NgxSpinnerModule,
     RouterModule,
     FormsModule,
     QuillModule
@@ -80,7 +81,6 @@ export class ModulesComponent {
     this.questionService.getCategories(filters).subscribe(
       (data:any) => {
         this.categories = data.categories
-        console.log(data.categories)
         this.ngxSpinner.hide('transactional')
       },
       (error:any)=> {
@@ -181,7 +181,6 @@ export class ModulesComponent {
       data => {
         this.modules = data.items
         this.totalItems = data.totalItems
-        console.log(this.modules)
         this.ngxSpinner.hide('transactional')
       },
       error=> {
