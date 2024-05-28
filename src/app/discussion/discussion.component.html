@@ -1,1 +1,22 @@
-<p>discussion works!</p>
+<h3>Comentários</h3>
+<form class="mb-4">
+    <div class="m-2">
+        <label for="commentQuestion">Comente</label>
+        <textarea [(ngModel)]="comment"
+        name="commentQuestion" id="commentQuestion" #commentInput
+        class="form-control"></textarea>
+    </div>
+    <div class="m-2">
+        <button class="btn btn-outline-primary" [disabled]="comment.length==0 || !question" 
+        (click)="addComment()">Enviar</button>
+    </div>
+</form>
+<hr>
+<div class="card col-12 m-2 p-1 rounded" *ngFor="let userComments of comments">
+    <div class="card-body">
+        <p class="card-text mb-1">{{userComments.comment}}</p>
+        <small class="text-muted"><i>{{userComments.createdAt | date:'dd/MM/yyyy HH:mm'}}</i></small>
+    </div>
+</div>
+<p class="text-muted" *ngIf="comments.length===0"><i>Ainda não há comentários. Seja o primeiro e comente agora.</i></p>
+

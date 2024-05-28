@@ -6,7 +6,7 @@
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="user-commenteds" data-bs-toggle="tab" data-bs-target="#user-commenteds-pane" type="button" role="tab" aria-controls="user-commenteds-pane" aria-selected="false">
-        <i class="bi bi-chat-square-quote"></i> Discussão
+        <i class="bi bi-chat-square-quote"></i> Discussão ({{totalComments}})
       </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -20,7 +20,7 @@
         <span [innerHTML]="question.comment"></span>
     </div>
     <div class="tab-pane fade" id="user-commenteds-pane" role="tabpanel" aria-labelledby="user-commenteds" tabindex="0">
-        <app-discussion [questionId]="question._id"></app-discussion>
+        <app-discussion [question]="question" (totalCommentsEmitter)="receiveTotalComments($event)"></app-discussion>
     </div>
     <div class="tab-pane fade" id="user-sinalize-pane" role="tabpanel" aria-labelledby="user-sinalize" tabindex="0">
         <app-form-problems [questionId]="question._id"></app-form-problems>

@@ -6,6 +6,7 @@ import { QuestionService } from '../services/question.service';
 import { ToastrService } from 'ngx-toastr';
 import { SocketService } from '../services/socket.service';
 import { QuestionDetailsComponent } from '../question-details/question-details.component';
+import { DiscussionComponent } from '../discussion/discussion.component';
 
 @Component({
   selector: 'app-question-view',
@@ -15,6 +16,7 @@ import { QuestionDetailsComponent } from '../question-details/question-details.c
     RouterModule,
     NgxSpinnerModule,
     QuestionDetailsComponent
+    
   ],
   templateUrl: './question-view.component.html',
   styleUrl: './question-view.component.css'
@@ -44,7 +46,6 @@ export class QuestionViewComponent implements OnInit {
   }
 
   loadData(): void {
-    console.log(this.id)
     this.ngxSpinner.show('transactional')
     this.questionService.getOneQuestionInDB(this.id).subscribe(
       data => {
@@ -60,5 +61,9 @@ export class QuestionViewComponent implements OnInit {
         this.ngxSpinner.hide('transactional')
       }
     )
+  }
+
+  getQuestion(): any {
+    return this.question
   }
 }

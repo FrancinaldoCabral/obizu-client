@@ -84,6 +84,7 @@ export class ProblemsComponent implements OnInit {
     this.questionService.updateQuestionsInDB([question]).subscribe(
       success => {
         this.ngxSpinner.hide('transactional')
+        this.editQuestion=null
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
         this.editQuestion = null
@@ -100,8 +101,25 @@ export class ProblemsComponent implements OnInit {
     this.questionService.deleteQuestionsInDB(_id).subscribe(
       success => {
         this.ngxSpinner.hide('transactional')
+        this.editQuestion=null
         this.loadData()
-        this.toastr.success(`Questão atualizada com sucesso.`)
+        this.toastr.success(`Questão removida com sucesso.`)
+        this.editQuestion = null
+      },
+      error => {
+        this.toastr.error(`Erro na remoção da questão.`)
+        this.ngxSpinner.hide('transactional')
+      }
+    )
+  }
+
+  removeProblem(_id:any): void {
+    this.ngxSpinner.show('transactional')
+    this.questionService.removeProblem(_id).subscribe(
+      success => {
+        this.ngxSpinner.hide('transactional')
+        this.loadData()
+        this.toastr.success(`Problema removido com sucesso.`)
         this.editQuestion = null
       },
       error => {

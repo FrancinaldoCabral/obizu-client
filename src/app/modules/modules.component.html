@@ -16,8 +16,7 @@
         </div>          
         <h5 class="fs-2 text-body-emphasis">{{module.title}}</h5>
         <p>{{module.description}}</p>  
-        <button class="btn" btn-primary btn-sm icon-link
-            [ngClass]="{'btn-primary btn-sm icon-link':module.indices.length>0, 'btn-outline-primary btn-sm icon-link':module.indices.length===0}"
+        <button class="btn btn-outline-primary btn-sm icon-link"
             routerLink="{{module._id}}"
             [disabled]="module.indices.length===0">
             <span *ngIf="module.indices.length>0">Começar</span>

@@ -203,4 +203,42 @@ export class QuestionService {
       })
     })
   }
+
+  removeProblem(_id:any): Observable<any> {
+    return this.http.delete(`${this.env.apiUrl}/api/sinalize/${_id}`,{
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  addComment(comment:string, questionId:string): Observable<any> {
+    const form = { comment, questionId, createdAt: new Date() }
+    return this.http.post(`${this.env.apiUrl}/api/discussion`, form, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  getComments(currentPage:number, pageSize:number, questionId:string): Observable<any> {
+    return this.http.get<any[]>(`${this.env.apiUrl}/api/discussion`, {
+      params: {
+        page: currentPage.toString(),
+        pageSize: pageSize.toString(),
+        questionId
+      },
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  removeComment(_id:any): Observable<any> {
+    return this.http.delete(`${this.env.apiUrl}/api/discussion/${_id}`,{
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
 }

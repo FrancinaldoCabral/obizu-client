@@ -80,6 +80,7 @@ export class QuestionsEditComponent implements OnInit {
     this.questionService.deleteQuestionsInDB(_id).subscribe(
       success => {
         this.ngxSpinner.hide('transactional')
+        this.editQuestion=null
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
         this.editQuestion = null
@@ -96,6 +97,7 @@ export class QuestionsEditComponent implements OnInit {
     this.questionService.updateQuestionsInDB([question]).subscribe(
       success => {
         this.ngxSpinner.hide('transactional')
+        this.editQuestion=null
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
         this.editQuestion = null
