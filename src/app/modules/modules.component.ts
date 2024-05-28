@@ -87,8 +87,7 @@ export class ModulesComponent {
         console.log(error)
         this.ngxSpinner.hide('transactional')
         this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
-      },
-      ()=> this.ngxSpinner.hide('transactional'))
+      })
   }
 
   decodificarSequenciasUnicode(texto: string): string {
@@ -186,9 +185,8 @@ export class ModulesComponent {
       error=> {
         console.log(error)
         this.ngxSpinner.hide('transactional')
-        this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
-      },
-      ()=> this.ngxSpinner.hide('transactional'))
+        //this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
+      })
   }
 
   editModule(module:any): void {

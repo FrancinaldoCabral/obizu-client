@@ -1,0 +1,28 @@
+<ul class="nav nav-tabs" id="commentedSolution" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="commented-solution" data-bs-toggle="tab" data-bs-target="#commented-solution-pane" type="button" role="tab" aria-controls="commented-solution-pane" aria-selected="true">
+        <i class="bi bi-chat-right-text"></i> Solução comentada
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="user-commenteds" data-bs-toggle="tab" data-bs-target="#user-commenteds-pane" type="button" role="tab" aria-controls="user-commenteds-pane" aria-selected="false">
+        <i class="bi bi-chat-square-quote"></i> Discussão
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="user-sinalize" data-bs-toggle="tab" data-bs-target="#user-sinalize-pane" type="button" role="tab" aria-controls="user-sinalize-pane" aria-selected="false">
+            <i class="bi bi-bug"></i> Algum problema?
+        </button>
+    </li>
+</ul>
+<div class="tab-content mt-4" id="commentedSolutionContent">
+    <div class="tab-pane fade show active" id="commented-solution-pane" role="tabpanel" aria-labelledby="commented-solution" tabindex="0">
+        <span [innerHTML]="question.comment"></span>
+    </div>
+    <div class="tab-pane fade" id="user-commenteds-pane" role="tabpanel" aria-labelledby="user-commenteds" tabindex="0">
+        <app-discussion [questionId]="question._id"></app-discussion>
+    </div>
+    <div class="tab-pane fade" id="user-sinalize-pane" role="tabpanel" aria-labelledby="user-sinalize" tabindex="0">
+        <app-form-problems [questionId]="question._id"></app-form-problems>
+    </div>
+</div>

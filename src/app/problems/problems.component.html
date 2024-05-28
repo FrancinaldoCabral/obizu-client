@@ -1,0 +1,150 @@
+<div class="container mt-4 pt-4">
+    <div class="row mt-4">
+        <div class="col">
+            <table class="table">
+                <tbody>
+                    <tr *ngFor="let problem of problems">
+                        <td class="col-10">
+                            <a href="mailto:{{problem.userEmail}}">{{problem.userEmail}}</a>
+                            <p>{{problem.comment}}</p>
+                            <small class="text-muted">{{problem.createdAt | date:'fullDate'}}</small>
+                        </td>
+                        <td class="col-2">
+                            <form>
+                                <button class="btn btn-outline-light btn-sm form-control me-1 mb-1"
+                                [routerLink]="['/question', problem.questionId]">Ver</button>
+                                
+                                <button class="btn btn-outline-primary btn-sm form-control me-1 mb-1" 
+                                type="button" 
+                                data-bs-toggle="modal"
+                                data-bs-target="#editQuestion"
+                                (click)="editQuestion=getQuestionById(problem.questionId);">
+                                <i class="bi bi-pencil-square"></i> Editar</button>
+                                
+                                <button class="btn btn-outline-danger btn-sm form-control me-1 mb-1 mt-2" (click)="removeQuestion(problem.questionId)">Remover</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <app-pagination *ngIf="problems.length>0"
+                [totalItems]="totalItems"
+                [itemsPerPage]="pageSize"
+                [currentPage]="currentPage"
+                (pageChanged)="onPageChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+</div>
+
+  <!-- Editar questões -->
+  <div class="modal fade" id="editQuestion" tabindex="-1"
+  aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 me-2" id="editQuestionLabel">
+          <i class="bi bi-pencil-square"></i> Editar questão
+        </h1>
+      </div>
+      <div class="modal-body">
+          <p class="card-text fw-italic" *ngIf="editQuestion==null">
+              Não há questões para editar aqui.
+          </p>
+      </div>
+      <div class="modal-body p-4"  *ngIf="editQuestion!=null">
+          <!-- Categorias -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-bookmark"></i> Categorias</h3>
+              <form>
+                  <div class="input-group mb-4">
+                      <input type="text" class="form-control border border-2" 
+                      aria-label="Adicione uma category" aria-describedby="btncategoryAddNew"
+                      autosize name="category" id="category" #categoryInput>
+                      <button class="btn btn-primary" type="button"
+                      (click)="editQuestion.categories.push(categoryInput.value)"
+                      id="btncategoryAddNew"><i class="bi bi-plus-circle"></i></button>                                
+                  </div>
+              </form>
+              <form *ngFor="let category of editQuestion?.categories; let iCategories=index">
+                  <span class="badge bg-light m-1">{{category}} <i class="bi bi-x m-2 cursor" (click)="editQuestion.categories.splice(iCategories, 1)"></i></span>
+              </form>
+          </span>
+          <!-- Enunciado da questão -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-question-circle"></i> Enunciado</h3>
+              <form *ngIf="editQuestion">
+                  <quill-editor class="form-control border-0 mb-2" 
+                  name="{{'statement'+editQuestion._id}}" id="{{'statement'+editQuestion._id}}"
+                  [(ngModel)]="editQuestion.statement"></quill-editor>
+              </form>
+          </span>
+          <!-- Alternativas -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-check-circle"></i> Alternativas</h3>
+              <form>
+                  <div class="mb-4 text-center">
+                      <quill-editor name="newAlternative" class="form-control border-0 mb-2"
+                      [(ngModel)]="newAlternative"></quill-editor>
+  
+                      <button class="btn btn-primary form-control border-0 mb-2" type="button"
+                      (click)="editQuestion.alternatives.push(newAlternative)"
+                      id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
+                      <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
+  
+                      
+                  </div>
+                  <div class="mb-2" *ngFor="let alternative of editQuestion.alternatives; trackBy: trackByQuestionId; let iAlt=index">
+                      <quill-editor class="form-control border-0 mb-2" 
+                      name="{{'question'+editQuestion._id+'alt'+'-'+iAlt}}"
+                      id="{{'question'+editQuestion._id+'alt'+'-'+iAlt}}"
+                      [(ngModel)]="editQuestion.alternatives[iAlt]"
+                      ></quill-editor>
+                      
+                      <span class="row">
+                          <div class="col-6">
+                              
+                              <button class="btn btn-outline-secondary form-control fw-bold" type="button" id="btnAnswer"
+                              [ngClass]="{'text-success':editQuestion.answer==iAlt, 'text-danger':editQuestion.answer!=iAlt}"
+                              (click)="editQuestion.answer=iAlt">
+  
+                              <span *ngIf="editQuestion.answer==iAlt">
+                                  <i class="bi bi-check-circle"></i> <br> Correto
+                              </span>
+                              <span *ngIf="editQuestion.answer!=iAlt">
+                                  <i class="bi bi-x-circle"></i> <br> Incorreto
+                              </span>
+                              
+                          </button>
+                          </div>
+                          <div class="col-6">
+                              <button class="btn btn-outline-danger form-control" type="button"
+                              (click)="editQuestion.alternatives.splice(iAlt, 1)"
+                              id="btnAlternativeRemove"><i class="bi bi-trash"></i> <br> Remover</button>
+                          </div>
+                      </span>
+                  </div>
+              </form>
+          </span>
+          <!-- Solução comentada -->
+          <span class="p-1 m-2">
+              <h3><i class="bi bi-check-circle-fill"></i> Solução comentada</h3>
+              <form>
+                  <quill-editor class="form-control border-0 mb-2" 
+                  name="{{'comment'+editQuestion._id}}" id="{{'comment'+editQuestion._id}}"
+                  [(ngModel)]="editQuestion.comment"></quill-editor>
+              </form>
+          </span>
+      </div>
+      <div class="card-footer text-end pb-2">
+          <button class="btn btn-light btn-sm m-1" 
+          (click)="editQuestion=null"
+          type="button" data-bs-dismiss="modal">Sair</button>
+          <button class="btn btn-primary btn-sm m-1" 
+          *ngIf="editQuestion"
+          (click)="updateQuestion(editQuestion)"
+          type="button" data-bs-dismiss="modal">Finalizar edição</button>
+      </div>
+    </div>
+  </div>
+  </div>

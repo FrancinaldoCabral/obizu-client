@@ -55,8 +55,7 @@ export class ModuleComponent implements OnInit {
         console.log(error)
         this.ngxSpinner.hide('transactional')
         this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
-      },
-      ()=> this.ngxSpinner.hide('transactional'))
+      })
   }
 
 }

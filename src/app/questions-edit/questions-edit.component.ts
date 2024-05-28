@@ -118,7 +118,7 @@ export class QuestionsEditComponent implements OnInit {
       error=> {
         console.log(error)
         this.ngxSpinner.hide('transactional')
-        this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
+        //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
       ()=> this.ngxSpinner.hide('transactional'))
   }

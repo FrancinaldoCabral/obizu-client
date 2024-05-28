@@ -130,18 +130,6 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
             </form>
             <form *ngFor="let category of editQuestion?.categories; let iCategories=index">
                 <span class="badge bg-light m-1">{{category}} <i class="bi bi-x m-2 cursor" (click)="editQuestion.categories.splice(iCategories, 1)"></i></span>
-<!--                 <div class="input-group mb-1">
-                    
-                    <input type="text" class="form-control bg-light" 
-                    aria-label="Recipient's username" aria-describedby="btncategoryRemoveNew"
-                    autosize name="{{'category'+editQuestion._id}}" 
-                    id="{{'category'+editQuestion._id}}" 
-                    [(ngModel)]="editQuestion.categories[iCategories]">
-
-                    <button class="btn btn-outline-danger" type="button"
-                    (click)="editQuestion.categories.splice(iCategories, 1)"
-                    id="btncategoryRemoveNew"><i class="bi bi-trash"></i></button>
-                </div> -->
             </form>
         </span>
         <!-- Enunciado da questão -->

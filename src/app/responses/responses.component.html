@@ -2,31 +2,94 @@
 <div class="container mt-4 mb-4 pb-4">
     <div class="row mb-4">
         <div class="col">
-            <h6>Respostas</h6>
-            <table class="table">
-                <tbody>
-                    <tr *ngFor="let response of responses">
-                        <td>{{response.createdAt | date:'fullDate'}}</td>
-                        <td>
-                            <span class="badge rounded-pill text-bg-light me-1" 
-                            *ngFor="let category of response.question?.categories">
-                            {{category}}
-                            </span>
-                        </td>
-                        <td>
-                            <span *ngIf="response.isCorrect" class="text-success">
-                                <i class="bi bi-check2-square"></i> Correto
-                            </span>
-                            <span *ngIf="!response.isCorrect" class="text-danger">
-                                <i class="bi bi-x-square"></i> Incorreto
-                            </span>
-                        </td>
-                        <td>
-                            <a [routerLink]="['/question', response.question._id]"><i class="bi bi-eye"></i> Ver questão</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <h3>Resultados</h3>
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                  <button class="nav-link active" id="analitycs-tab" data-bs-toggle="tab" data-bs-target="#analitycs" type="button" role="tab" aria-controls="analitycs" aria-selected="true">Estatísticas</button>
+                  <button class="nav-link" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab" aria-controls="responses" aria-selected="false">Respostas</button>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane p-2 fade show active" id="analitycs" role="tabpanel" aria-labelledby="analitycs-tab" tabindex="0">
+                    <br>
+                    <table class="table m-2">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    Questões respondidas:
+                                </th>
+                                <td>{{responses.length}}</td>
+                            </tr>
+                            <tr class="text-success">
+                                <th>
+                                    % Acertos:
+                                </th>
+                                <td>{{acertos().acertos}} ({{acertos().perCentAcertos | number:'1.2-2'}}%)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <h6>
+                        Distribuição das respostas
+                    </h6>
+                    <p>R=Respondidas; A=Acertos; D=Desempenho</p>
+                    <table class="table m-2">
+                        <thead>
+                            <tr>
+                                <td class="col-9">Categorias</td>
+                                <td class="col-1 text-center">R</td>
+                                <td class="col-1 text-center">A</td>
+                                <td class="col-1 text-center">D</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let respPerCategory of acertosPerFilters()">
+                                <td>
+                                    <span class="badge rounded-pill text-bg-light me-1" 
+                                    *ngFor="let category of respPerCategory?.categories">
+                                    {{category}}
+                                    </span>
+                                </td>
+                                <td>{{respPerCategory.total}}</td>
+                                <td>{{respPerCategory.correct}}</td>
+                                <td>{{(respPerCategory.correct*100)/respPerCategory.total | number:'1.2-2'}}%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="responses" role="tabpanel" aria-labelledby="responses-tab" tabindex="0">
+                    <table class="table">
+                        <tbody>
+                            <tr *ngFor="let response of responsesPagination()">
+                                <td>
+                                    <span class="badge rounded-pill text-bg-light me-1" 
+                                    *ngFor="let category of response.question?.categories">
+                                    {{category}}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">{{response.createdAt | date:'fullDate'}}</small>
+                                    <br>
+                                    <span *ngIf="response.isCorrect" class="text-success">
+                                        <i class="bi bi-check2-square"></i> Correto
+                                    </span>
+                                    <span *ngIf="!response.isCorrect" class="text-danger">
+                                        <i class="bi bi-x-square"></i> Incorreto
+                                    </span>
+                                </td>
+                                <td>
+                                    <a [routerLink]="['/question', response.question._id]"><i class="bi bi-eye"></i> Ver questão</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <app-pagination *ngIf="responses.length>0"
+                        [totalItems]="responses.length"
+                        [itemsPerPage]="itemsPerPage"
+                        [currentPage]="currentPage"
+                        (pageChanged)="onPageChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
         </div>
     </div>
 </div>

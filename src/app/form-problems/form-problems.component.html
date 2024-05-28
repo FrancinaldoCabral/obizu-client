@@ -1,0 +1,12 @@
+<form>
+    <div class="m-2">
+        <label for="commentQuestion">Descreva o problema</label>
+        <textarea [(ngModel)]="comment"
+        name="commentQuestion" id="commentQuestion" #commentInput
+        class="form-control"></textarea>
+        <small class="form-text text-warning" *ngIf="commentInput.value.length==0"></small>
+    </div>
+    <div class="m-2">
+        <button class="btn btn-outline-primary" (click)="addProblem()">Enviar</button>
+    </div>
+</form>

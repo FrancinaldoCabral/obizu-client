@@ -256,3 +256,7 @@ img {
   height: auto;
 }
 
+body, nav.navbar {
+  background-color: var(--bs-light);
+}
+

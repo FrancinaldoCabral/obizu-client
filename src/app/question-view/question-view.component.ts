@@ -5,6 +5,7 @@ import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { QuestionService } from '../services/question.service';
 import { ToastrService } from 'ngx-toastr';
 import { SocketService } from '../services/socket.service';
+import { QuestionDetailsComponent } from '../question-details/question-details.component';
 
 @Component({
   selector: 'app-question-view',
@@ -12,7 +13,8 @@ import { SocketService } from '../services/socket.service';
   imports: [
     CommonModule,
     RouterModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    QuestionDetailsComponent
   ],
   templateUrl: './question-view.component.html',
   styleUrl: './question-view.component.css'
@@ -52,7 +54,7 @@ export class QuestionViewComponent implements OnInit {
       error => {
         console.log(error)
         this.ngxSpinner.hide('transactional')
-        this.toastrService.error('Erro no carregamento da questão.')
+        //this.toastrService.error('Erro no carregamento da questão.')
       },
       () => {
         this.ngxSpinner.hide('transactional')

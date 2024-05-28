@@ -5,6 +5,7 @@ import { QuestionService } from '../services/question.service'
 import { ToastrService } from 'ngx-toastr'
 import { SocketService } from '../services/socket.service'
 import { Router, RouterModule } from '@angular/router'
+import { QuestionDetailsComponent } from '../question-details/question-details.component'
 
 @Component({
   selector: 'app-question',
@@ -12,7 +13,8 @@ import { Router, RouterModule } from '@angular/router'
   imports: [
     CommonModule,
     RouterModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    QuestionDetailsComponent
   ],
   templateUrl: './question.component.html',
   styleUrl: './question.component.css'

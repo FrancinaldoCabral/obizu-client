@@ -182,4 +182,25 @@ export class QuestionService {
       })
     })
   }
+
+  sinalizeProblem(comment:string, questionId:string): Observable<any> {
+    const form = { comment, questionId, createdAt: new Date() }
+    return this.http.post(`${this.env.apiUrl}/api/sinalize`, form, {
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  getProblems(currentPage:number, pageSize:number): Observable<any> {
+    return this.http.get<any[]>(`${this.env.apiUrl}/api/sinalize`, {
+      params: {
+        page: currentPage.toString(),
+        pageSize: pageSize.toString()
+      },
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
 }
