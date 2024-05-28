@@ -20,7 +20,8 @@
                 <div class="alert alert-light" role="alert">
                     <p><em>Crie questões e em seguida salve no banco de dados.</em></p>
                     <div class="btn-group dropup">
-                        <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button type="button" class="btn btn-outline-dark dropdown-toggle" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-robot"></i> Ações
                         </button>
                         <ul class="dropdown-menu">
@@ -38,26 +39,20 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item cursor"
-                                    (click)="openFiles()">
-                                    <i class="bi bi-upload"></i> Fazer upload de questões
-                                </a>
-                            </li>
-                            <li *ngIf="questionsInFailed.length>0">
-                                <a class="dropdown-item cursor text-danger"
+                                <a class="dropdown-item cursor text-danger" [ngClass]="{'disabled': questionsInFailed.length>0}"
                                     (click)="downloadQuestionsInFailed()">
                                     Últimas falhas ({{questionsInFailed.length}})
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
-                            <li *ngIf="getCopiedQuestions().length>0">
-                                <a class="dropdown-item cursor"
+                            <li>
+                                <a class="dropdown-item cursor" [ngClass]="{'disabled':getCopiedQuestions().length>0}"
                                     (click)="pasteQuestions()">
                                     <i class="bi bi-clipboard-fill"></i> Colar ({{getCopiedQuestions().length}})
                                 </a>
                             </li>
-                            <li *ngIf="getCopiedQuestions().length>0">
-                                <a class="dropdown-item cursor"
+                            <li>
+                                <a class="dropdown-item cursor" [ngClass]="{'disabled':getCopiedQuestions().length>0}"
                                     (click)="clearCopiedQuestions()">
                                     Limpar área de transferencia ({{getCopiedQuestions().length}})
                                 </a>
@@ -143,18 +138,6 @@
     <br><br><br><br><br><br>
     <div class="row mt-4">
         <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-bottom justify-content-center">
-            <form class="d-flex" role="button">
-                    <select name="model" id="model"
-                    class="form-control m-1"
-                    aria-describedby="modelHelp"
-                    (change)="onOptionChange($event)">
-                        <option *ngFor="let m of models; let i=index" [disabled]="disabledModels.includes(m)"
-                            [value]="m" 
-                            [selected]="m == model">
-                            {{m}}
-                        </option>
-                    </select>
-            </form>
             <div class="btn-group dropup">
                 <button type="button" class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-robot"></i> Ações
@@ -226,6 +209,18 @@
                 </ul>
             </div>
             <form class="d-flex" role="button">
+                    <select name="model" id="model"
+                    class="form-control m-1"
+                    aria-describedby="modelHelp"
+                    (change)="onOptionChange($event)">
+                        <option *ngFor="let m of models; let i=index" [disabled]="disabledModels.includes(m)"
+                            [value]="m" 
+                            [selected]="m == model">
+                            {{m}}
+                        </option>
+                    </select>
+            </form>
+            <form class="d-flex" role="button">
                 <button class="btn btn-outline-danger m-1" type="button" [disabled]="selectedItems.size==0"
                     (click)="removeSelectedItems()">
                     <i class="bi bi-trash"></i> Remover seleção ({{selectedItems.size}})
@@ -236,78 +231,6 @@
                 </button>
             </form>
         </nav>
-    </div>
-</div>
-
-
-<!-- Criar questões a partir do pdf -->
-<div class="modal fade" id="createFromPdfModal" tabindex="-1" 
-    aria-labelledby="createFromPdfModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5 me-2" id="createFromPdfModalLabel">
-            <i class="bi bi-filetype-pdf"></i> A partir de .pdf
-          </h1>
-        </div>
-        <div class="modal-body">
-            <span class="badge bg-light mb-2">{{model}}</span>
-            <span>
-                <form class="form">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="mb-2">
-                                <label for="codProva" class="form-label">CONCURSO</label>
-                                <input class="form-control form-control-sm" required
-                                    placeholder="Ex.: CFSD, CBFN"
-                                    id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="mb-2">
-                                <label for="qtdeQestions" class="form-label">Quantas questões?</label>
-                                <input type="number" name="qtdeQuestions" class="form-control form-control-sm" [(ngModel)]="qtdeQuestions">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <label for="provaFile" class="form-label">Prova .pdf</label>
-                        <input class="form-control form-control-sm" required
-                            id="provaFile" name="provaFile" type="file" (change)="onProvaSelected($event)">
-                    </div>
-                    <div class="mb-2">
-                        <label for="gabaritoFile" class="form-label">Gabarito .pdf</label>
-                        <input class="form-control form-control-sm" 
-                            id="gabaritoFile" name="gabaritoFile" type="file" (change)="onGabaritoSelected($event)">
-                    </div>
-                    <div class="mb-2">
-                        <label for="editalFile" class="form-label">Edital .pdf</label>
-                        <input class="form-control form-control-sm" 
-                            id="editalFile" name="editalFile" type="file" (change)="onEditalSelected($event)">
-                    </div>
-                </form>
-                <div class="alert alert-secondary mt-4" role="alert">
-                    <h6>
-                        Custos com IA
-                    </h6>
-                    <p>
-                        ${{credits}} Custo da última geração neste dispositivo.
-                    </p>
-                    <p>
-                        ${{totalCredits}} Custo total das gerações atuais neste dispositivo.
-                    </p>
-                    <button class="btn btn-light btn-sm" (click)="resetCredits()">Reset</button>
-                </div>
-            </span>
-        </div>
-        <div class="card-footer text-center pt-2">
-            <button #closeBtn type="button" class="btn btn-outline-dark mb-2" data-bs-dismiss="modal">Sair</button>
-            <button type="button" class="btn btn-dark mb-2 ms-1"
-                (click)="questionsCreateWithPdf()" [disabled]="!provaFile">
-                <span *ngIf="!uploadSpinner"><i class="bi bi-filetype-pdf"></i> Criar questões com IA (pdf)</span>
-            </button>
-        </div>
-      </div>
     </div>
 </div>
 
@@ -326,14 +249,14 @@
             <span>
                 <form #formTypeText="ngForm" (blur)="saveFormQuestionByText()">
                     <div class="row">
-                        <div class="col-6">
+<!--                         <div class="col-6">
                             <div class="mb-2">
                                 <label for="codProva" class="form-label">CONCURSO</label>
                                 <input class="form-control form-control-sm" required
                                     placeholder="Ex.: CFSD, CBFN"
                                     id="codProva" name="codProva" type="text" [(ngModel)]="codProva">
                             </div>
-                        </div>
+                        </div> -->
                         <div class="col-6">
                             <div class="mb-2">
                                 <label for="qtdeQestions" class="form-label">Quantas questões?</label>
@@ -363,9 +286,9 @@
         <div class="card-footer text-center pt-2">
             <button #closeBtn type="button" class="btn btn-outline-dark mb-2" data-bs-dismiss="modal">Sair</button>
             <button type="button" class="btn btn-dark mb-2 ms-1"
-                [disabled]="!contentToQuestions"
+                [disabled]="contentToQuestions.length===0"
                 (click)="extractionQuestionsByParts()">
-                <span *ngIf="!uploadSpinner"><i class="bi bi-body-text"></i> Criar questões com IA (texto)</span>
+                <i class="bi bi-body-text"></i> Criar questões com IA (texto)
             </button>
         </div>
       </div>

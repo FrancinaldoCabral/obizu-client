@@ -359,69 +359,6 @@ export class QuestionsRegisterComponent implements OnInit{
     this.editalFile = event.target.files[0]
     //this.uploadFile()
   }
-
-  questionsCreateWithPdf(): void {
-    this.status = `Criando a partir de pdf. Modelo ${this.model}`
-    this.ngxSpinner.show('ia-creator')
-
-    if(!this.codProva || !this.provaFile) {
-      this.status = ''
-      this.ngxSpinner.hide('ia-creator')
-      return
-    }
-
-    const formData: FormData = new FormData()
-    formData.append('codProva', this.codProva)
-    formData.append('qtdeQuestions', this.qtdeQuestions.toString())
-    formData.append('provaFile', this.provaFile, this.provaFile.name)
-    formData.append('gabaritoFile', this.gabaritoFile, this.gabaritoFile.name)
-    formData.append('editalFile', this.editalFile, this.editalFile.name)
-
-    this.questionService.createQuestions(formData, this.model, 'pdf').subscribe(
-      (response) => {
-        this.jobId = response.id
-      },
-      (error) => {
-        this.toastrService.error('Erro na geração de questões.')
-        this.jobId = ''
-        this.status = ''
-        this.ngxSpinner.hide('ia-creator')
-      }
-    )
-  }
-
-  questionsCreateWithPureText(): void {
-    this.status = `Criando a partir de textos. Modelo ${this.model}`
-    this.ngxSpinner.show('ia-creator')
-    
-    this.saveFormQuestionByText()
-
-    if(!this.codProva || !this.qtdeQuestions || !this.contentToQuestions) {
-      this.ngxSpinner.hide('ia-creator')
-      this.toastrService.info('Concurso, Qtde de questões e o conteúdo são necessários.')
-      return
-    }
-
-    const form = {     
-      model: this.model, 
-      codProva: this.codProva,
-      qtdeQuestions: this.qtdeQuestions,
-      contentToQuestions: this.contentToQuestions, 
-      metadata: { userId: this.auth.getUser().id } } 
-
-    this.questionService.createQuestions(form, this.model, 'text').subscribe(
-      (response) => {
-        this.jobId = response.id
-      },
-      (error) => {
-        this.toastrService.error('Erro na geração de questões.')
-        this.status = ''
-        this.jobId = ''
-        this.ngxSpinner.hide('ia-creator')
-      }
-    )
-  }
-
   replicateQuestions(): void {
     this.ngxSpinner.show('ia-creator')
     this.status = `Replicando questões. Modelo ${this.model}`
@@ -472,18 +409,17 @@ export class QuestionsRegisterComponent implements OnInit{
     this.ngxSpinner.show('ia-creator')
     this.status = `Replicando questões. Modelo ${this.model}`
 
-    if(this.getSelecteds().length==0) {
+    if(this.contentToQuestions.length==0) {
       this.ngxSpinner.hide('ia-creator')
-      this.toastrService.info('Selecione questões.')
+      this.toastrService.info('Adicione conteúdo.')
       return
     }
 
     const form = {     
       model: this.model, 
-      codProva: this.codProva,
       qtdeQuestions: this.qtdeQuestions,
-      contentToQuestions: this.contentToQuestions, 
-      metadata: { userId:1 } }
+      contentToQuestions: this.contentToQuestions
+    }
     
     this.socketService.emitExtraction(form)
   }
@@ -591,7 +527,7 @@ export class QuestionsRegisterComponent implements OnInit{
   downloadQuestionsInFailed(): void {
     if(this.questionsInFailed.length==0) {
       this.ngxSpinner.hide('ia-creator')
-      this.toastrService.info('Selecione questões.')
+      this.toastrService.info('Não há questões falhadas.')
       return
     }
     const jsonStr = JSON.stringify(this.questionsInFailed, null, 2) 
