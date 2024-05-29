@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { QuestionService } from '../services/question.service';
 import { SocketService } from '../services/socket.service';
 import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-discussion',
@@ -35,8 +36,7 @@ export class DiscussionComponent implements OnInit, OnChanges  {
   constructor(
     private questionService: QuestionService,
     private ngxSpinner: NgxSpinnerService,
-    private socketService: SocketService,
-    private toastr: ToastrService
+    private auth: AuthService
   ){
 
   }
@@ -45,10 +45,18 @@ export class DiscussionComponent implements OnInit, OnChanges  {
 
   }
 
+  getUser(): any {
+    return this.auth.getUser()
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     if (changes['question']) {
       this.question = changes['question'].currentValue
       this.loadData()
+    }
+
+    if(changes['totalItems']){
+      this.totalCommentsEmitter.emit(changes['totalItems'].currentValue)
     }
   }
 
@@ -60,6 +68,7 @@ export class DiscussionComponent implements OnInit, OnChanges  {
         this.comments = data.items
         console.log(this.comments)
         this.totalItems = data.totalItems
+        console.log(this.totalItems)
         this.totalCommentsEmitter.emit(this.totalItems)
         this.ngxSpinner.hide('transactional')
       },
@@ -72,7 +81,8 @@ export class DiscussionComponent implements OnInit, OnChanges  {
 
   addComment(): void {
     this.ngxSpinner.show('transactional')
-    this.questionService.addComment(this.comment, this.question._id).subscribe(
+    const userDisplayName = this.getUser().user_display_name
+    this.questionService.addComment(this.comment, this.question._id, userDisplayName).subscribe(
       data => {
         this.ngxSpinner.hide('transactional')
         this.loadData()

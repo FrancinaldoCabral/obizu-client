@@ -212,8 +212,8 @@ export class QuestionService {
     })
   }
 
-  addComment(comment:string, questionId:string): Observable<any> {
-    const form = { comment, questionId, createdAt: new Date() }
+  addComment(comment:string, questionId:string, userDisplayName:string): Observable<any> {
+    const form = { comment, questionId, userDisplayName, createdAt: new Date() }
     return this.http.post(`${this.env.apiUrl}/api/discussion`, form, {
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`
@@ -227,6 +227,18 @@ export class QuestionService {
         page: currentPage.toString(),
         pageSize: pageSize.toString(),
         questionId
+      },
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  getCommentsAdmin(currentPage:number, pageSize:number): Observable<any> {
+    return this.http.get<any[]>(`${this.env.apiUrl}/api/admin-discussion`, {
+      params: {
+        page: currentPage.toString(),
+        pageSize: pageSize.toString()
       },
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`

@@ -20,7 +20,7 @@
         <span [innerHTML]="question.comment"></span>
     </div>
     <div class="tab-pane fade" id="user-commenteds-pane" role="tabpanel" aria-labelledby="user-commenteds" tabindex="0">
-        <app-discussion [question]="question" (totalCommentsEmitter)="receiveTotalComments($event)"></app-discussion>
+        <app-discussion [question]="question"></app-discussion>
     </div>
     <div class="tab-pane fade" id="user-sinalize-pane" role="tabpanel" aria-labelledby="user-sinalize" tabindex="0">
         <app-form-problems [questionId]="question._id"></app-form-problems>

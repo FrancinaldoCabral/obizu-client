@@ -8,6 +8,7 @@ import { QuestionComponent } from './question/question.component'
 import { ResponsesComponent } from './responses/responses.component'
 import { QuestionViewComponent } from './question-view/question-view.component'
 import { ProblemsComponent } from './problems/problems.component'
+import { DiscussionAdminComponent } from './discussion-admin/discussion-admin.component'
 
 export const routes: Routes = [
     //{ path:'questions-register', title:'Registro de questões', component: QuestionsRegisterComponent },
@@ -15,6 +16,7 @@ export const routes: Routes = [
     { path:'admin/edit', title:'Questões - admin', component: QuestionsEditComponent },
     { path:'admin/modules', title:'Módulos - admin', component: ModuleAdminComponent },
     { path:'admin/problems', title:'Problemas', component: ProblemsComponent },
+    { path:'admin/discussion', title:'Problemas', component: DiscussionAdminComponent },
     
     { path:'modules', title:'Módulos', component: ModulesComponent },
     { path:'modules/:id', title:'Módulo', component: ModuleComponent },

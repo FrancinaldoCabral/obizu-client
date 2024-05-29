@@ -1,22 +1,46 @@
 <h3>Comentários</h3>
 <form class="mb-4">
-    <div class="m-2">
-        <label for="commentQuestion">Comente</label>
-        <textarea [(ngModel)]="comment"
-        name="commentQuestion" id="commentQuestion" #commentInput
-        class="form-control"></textarea>
-    </div>
-    <div class="m-2">
-        <button class="btn btn-outline-primary" [disabled]="comment.length==0 || !question" 
-        (click)="addComment()">Enviar</button>
+    <div class="input-group mb-3">
+        <textarea type="text" class="form-control" placeholder="Escreva um comentário." 
+        aria-label="Recipient's username" aria-describedby="button-addon-send"
+        [(ngModel)]="comment"
+        name="commentQuestion" id="commentQuestion" #commentInput></textarea>
+        <button class="btn btn-secondary" type="button" id="button-addon-send"
+        [disabled]="comment.length==0 || !question || !getUser()?.user_display_name"
+        (click)="addComment()">
+            Enviar
+        </button>
     </div>
 </form>
 <hr>
-<div class="card col-12 m-2 p-1 rounded" *ngFor="let userComments of comments">
-    <div class="card-body">
-        <p class="card-text mb-1">{{userComments.comment}}</p>
-        <small class="text-muted"><i>{{userComments.createdAt | date:'dd/MM/yyyy HH:mm'}}</i></small>
-    </div>
-</div>
-<p class="text-muted" *ngIf="comments.length===0"><i>Ainda não há comentários. Seja o primeiro e comente agora.</i></p>
+<table class="table table-striped" *ngIf="comments.length>0">
+    <tbody>
+        <tr *ngFor="let userComments of comments">
+            <td class="col-11">
+                <small class="text-muted"><i class="bi bi-person"></i> <i>{{userComments.userDisplayName}}</i></small><br>               
+                <p class="card-text mb-1">{{userComments.comment}}</p>
+                <small class="text-muted"><i>{{userComments.createdAt | date:'dd/MM/yyyy HH:mm'}}</i></small>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>
+                <div class="row justify-content-center">
+                    <div class="col-12 text-center flex">
+                        <app-pagination *ngIf="comments.length>0"
+                            [totalItems]="totalItems"
+                            [itemsPerPage]="pageSize"
+                            [currentPage]="currentPage"
+                            (pageChanged)="onPageChange($event)">
+                        </app-pagination>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+<p class="text-muted" *ngIf="comments.length===0">
+    <i>Ainda não há comentários. Seja o primeiro e comente agora.</i>
+</p>
 

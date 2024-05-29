@@ -1,0 +1,48 @@
+<br><br>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <table class="table table-striped" *ngIf="comments.length>0">
+                <tbody>
+                    <tr *ngFor="let userComments of comments">
+                        <td class="col-10">
+                            <small class="text-muted"><i class="bi bi-person"></i> <i>{{userComments.userDisplayName}}</i></small><br>               
+                            <p class="card-text mb-1">{{userComments.comment}}</p>
+                            <small class="text-muted"><i>{{userComments.createdAt | date:'dd/MM/yyyy HH:mm'}}</i></small>
+                        </td>
+                        <td>
+                            <button class="btn btn-outline-light btn-sm m-1" [routerLink]="['/question', userComments.questionId]">Questão</button>
+                            <button class="btn btn-danger btn-sm m-1" (click)="removeComment(userComments._id)">Remover</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <div class="row justify-content-center">
+                                <div class="col-12 text-center flex">
+                                    <app-pagination *ngIf="comments.length>0"
+                                        [totalItems]="totalItems"
+                                        [itemsPerPage]="pageSize"
+                                        [currentPage]="currentPage"
+                                        (pageChanged)="onPageChange($event)">
+                                    </app-pagination>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+            <p class="text-muted" *ngIf="comments.length===0">
+                <i>Ainda não há comentários.</i>
+            </p>
+        </div>
+    </div>
+</div>
+
+<ngx-spinner class="mb-2" name="transactional"
+bdColor="rgba(0, 0, 0, 0.8)" size ="medium" color="#fff" type="ball-atom" [fullScreen] = "true"
+>
+<!-- <p class="text-secondary mt-2">Loading...</p> -->
+Aguarde...
+</ngx-spinner>

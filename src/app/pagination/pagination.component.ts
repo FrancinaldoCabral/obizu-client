@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-pagination',
@@ -8,7 +8,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.css'
 })
-export class PaginationComponent {
+export class PaginationComponent implements OnInit, OnChanges {
   @Input() totalItems!: number;
   @Input() itemsPerPage!: number;
   @Input() currentPage: number = 1;
@@ -20,6 +20,14 @@ export class PaginationComponent {
   ngOnInit(): void {
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.setPageNumbers();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['totalItems'] && changes['itemsPerPage'] && changes['currentPage']) {
+      this.totalItems = changes['totalItems'].currentValue
+      this.itemsPerPage = changes['itemsPerPage'].currentValue
+      this.currentPage = changes['currentPage'].currentValue
+    }
   }
 
   setPageNumbers(): void {

@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormProblemsComponent } from '../form-problems/form-problems.component';
 import { DiscussionComponent } from '../discussion/discussion.component';
+import { QuestionService } from '../services/question.service';
 
 @Component({
   selector: 'app-question-details',
@@ -12,17 +13,31 @@ import { DiscussionComponent } from '../discussion/discussion.component';
   templateUrl: './question-details.component.html',
   styleUrl: './question-details.component.css'
 })
-export class QuestionDetailsComponent implements OnInit {
+export class QuestionDetailsComponent implements OnChanges {
 
   @Input('question') question!:any
-  totalComments!:number
+  totalComments:number = 0
 
-  ngOnInit(): void {
-    console.log('question in question details', this.question)
+  constructor(private questionService: QuestionService){
+
   }
 
-  receiveTotalComments(event: any) {
-    console.log('receive total comments', event)
-    this.totalComments = event;
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['question']) {
+      this.question = changes['question'].currentValue
+      this.loadData()
+    }
+  }
+
+  loadData(): void {
+    const questionId = this.question._id
+    this.questionService.getComments(1, 1, questionId).subscribe(
+      data => {
+        this.totalComments = data.totalItems
+      },
+      error=> {
+        console.log(error)
+        //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
+    })
   }
 }

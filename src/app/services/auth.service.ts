@@ -72,6 +72,7 @@ export class AuthService {
             if(success.code === 'jwt_auth_valid_token'){
               this.me(user?.token).subscribe(
                 userUpdate => {
+                  //console.log(userUpdate)
                   userUpdate.token = user?.token
                   this.setUser(userUpdate)
                   this.setAuthenticate(true)
