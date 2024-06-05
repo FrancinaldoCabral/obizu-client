@@ -23,10 +23,13 @@ export class QuestionComponent implements OnInit {
   @Input() filters!: string[]
   @Input() id!: string
   questions: any[] = []
+  categories: any[] = []
+  localFilters: string[] = []
   iQuestions: number = 0
   responses: number[]=[]
   confirmeds: boolean[]=[]
   verifySpinner: boolean = false
+  module: any
   
   tapAlternativeAudio: HTMLAudioElement = new Audio()
   pageTurnAudio: HTMLAudioElement = new Audio()
@@ -44,7 +47,8 @@ export class QuestionComponent implements OnInit {
     this.socketService.getConnecSource$.subscribe(
       connect => {
           if(connect){
-            this.loadData()
+            this.loadQuestions()
+            this.loadModule()
           }else{
             this.ngxSpinner.hide()
           }
@@ -66,29 +70,74 @@ export class QuestionComponent implements OnInit {
   ngOnInit(): void {
     this.loadAudios()
     if(this.socketService.getSocketIsConnect()) {
-      this.loadData()
+      this.loadQuestions()
+      this.loadModule()
     }
   }
 
-  async loadData(): Promise<void> {
-    this.ngxSpinner.show('transactional')
+  navigateProduct(): void {
+    window.location.href = `https://obizu.online/modulo/${this.module.product.slug}`
+  }
+
+  navigateModule(): void {
+    this.router.navigateByUrl(`/modules`)
+  }
+
+  loadModule() {
+    
+    this.questionService.getOneModule(this.id).subscribe(
+      data => {
+        this.module = data
+        
+      },
+      error=> {
+        console.log(error)
+        
+        this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
+      })
+  }
+
+  async loadQuestions(): Promise<void> {
+    this.questions = []
+    this.iQuestions = 0
     await new Promise((resolve, reject)=>{
-      this.questionService.randomQuestions(this.filters).subscribe(
+      this.questionService.randomQuestions(this.filters, this.id).subscribe(
         data => {
           data.questions.forEach((question:any) => {
             this.questions.push(question)
           })
-          this.ngxSpinner.hide('transactional')
+          
           resolve
         },
         error=> {
           console.log(error)
-          this.router.navigateByUrl(`/modules/${this.id}`)
-          this.ngxSpinner.hide('transactional')
+          
+          if(error.status == 403){
+            document.getElementById('btnModalPermission')?.click()
+          }else{
+            this.router.navigateByUrl(`/modules/${this.id}`)
+          }
+          
           //this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
           reject
         })
     })
+  }
+
+  loadCategories() {
+    
+    const filters = this.filters.map((filter:any)=>{ return filter._id })
+    this.questionService.getCategories(filters).subscribe(
+      (data:any) => {
+        this.categories = data.categories
+        console.log(data.categories)
+        
+      },
+      (error:any)=> {
+        console.log(error)
+        
+        this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
+      })
   }
 
   toRespond(iAlternative: number): void {
@@ -110,13 +159,13 @@ export class QuestionComponent implements OnInit {
     this.pageTurnAudio.play() 
     this.iQuestions++
     if(this.iQuestions>=this.questions.length) {
-      await this.loadData()
+      await this.loadQuestions()
     }
   }
 
   verify(): void {
     this.verifySpinner = true
-    this.questionService.respond(this.questions[this.iQuestions]._id, this.responses[this.iQuestions]).subscribe(
+    this.questionService.respond(this.questions[this.iQuestions]._id, this.responses[this.iQuestions], this.id).subscribe(
       data => {
         const userResponses = data.userResponses
         if(userResponses.isCorrect){

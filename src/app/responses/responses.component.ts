@@ -54,16 +54,16 @@ export class ResponsesComponent {
   }
 
   loadData(): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.usersResponses(this.filters).subscribe(
       data => {
         this.responses = data.userResponses
         console.log(this.responses)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       })
   }

@@ -2,7 +2,7 @@
 <div class="container mt-4 mb-4 pb-4">
     <div class="row mb-4">
         <div class="col" *ngIf="responses.length===0">
-            <p class="text-muted border p-4 mt-4 text-center">
+            <p class="text-body-secondary border p-4 mt-4 text-center">
                 <i>Não há respostas. Responda algumas questões.</i>
             </p>
         </div>
@@ -10,12 +10,44 @@
             <h3>Resultados</h3>
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                  <button class="nav-link active" id="analitycs-tab" data-bs-toggle="tab" data-bs-target="#analitycs" type="button" role="tab" aria-controls="analitycs" aria-selected="true">Estatísticas</button>
-                  <button class="nav-link" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab" aria-controls="responses" aria-selected="false">Respostas</button>
+                    <button class="nav-link active" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses" type="button" role="tab" aria-controls="responses" aria-selected="false">Respostas</button>
+                    <button class="nav-link" id="analitycs-tab" data-bs-toggle="tab" data-bs-target="#analitycs" type="button" role="tab" aria-controls="analitycs" aria-selected="true">Estatísticas</button>            
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane p-2 fade show active" id="analitycs" role="tabpanel" aria-labelledby="analitycs-tab" tabindex="0">
+                <div class="tab-pane fade show active" id="responses" role="tabpanel" aria-labelledby="responses-tab" tabindex="0">
+                    <table class="table">
+                        <tbody>
+                            <tr *ngFor="let response of responsesPagination()">
+                                <td>
+                                    <span class="badge rounded-pill text-bg-light me-1" 
+                                    *ngFor="let category of response.question?.categories">
+                                    {{category}}
+                                    </span>
+                                    <br>
+                                    <small class="text-body-secondary">{{response.createdAt | date:'dd/MM/yyyy HH:mm'}}</small>
+                                    <br>
+                                    <span *ngIf="response.isCorrect" class="text-success">
+                                        <i class="bi bi-check2-square"></i> Correto
+                                    </span>
+                                    <span *ngIf="!response.isCorrect" class="text-danger">
+                                        <i class="bi bi-x-square"></i> Incorreto
+                                    </span>
+                                </td>
+                                <td>
+                                    <a [routerLink]="['/question', response.question._id]"><i class="bi bi-eye"></i> Ver questão</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <app-pagination *ngIf="responses.length>0"
+                        [totalItems]="responses.length"
+                        [itemsPerPage]="itemsPerPage"
+                        [currentPage]="currentPage"
+                        (pageChanged)="onPageChange($event)">
+                    </app-pagination>
+                </div>                
+                <div class="tab-pane p-1 fade" id="analitycs" role="tabpanel" aria-labelledby="analitycs-tab" tabindex="0">
                     <br>
                     <table class="table m-2">
                         <tbody>
@@ -61,38 +93,6 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
-                <div class="tab-pane fade" id="responses" role="tabpanel" aria-labelledby="responses-tab" tabindex="0">
-                    <table class="table">
-                        <tbody>
-                            <tr *ngFor="let response of responsesPagination()">
-                                <td>
-                                    <span class="badge rounded-pill text-bg-light me-1" 
-                                    *ngFor="let category of response.question?.categories">
-                                    {{category}}
-                                    </span>
-                                    <br>
-                                    <small class="text-muted">{{response.createdAt | date:'dd/MM/yyyy HH:mm'}}</small>
-                                    <br>
-                                    <span *ngIf="response.isCorrect" class="text-success">
-                                        <i class="bi bi-check2-square"></i> Correto
-                                    </span>
-                                    <span *ngIf="!response.isCorrect" class="text-danger">
-                                        <i class="bi bi-x-square"></i> Incorreto
-                                    </span>
-                                </td>
-                                <td>
-                                    <a [routerLink]="['/question', response.question._id]"><i class="bi bi-eye"></i> Ver questão</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <app-pagination *ngIf="responses.length>0"
-                        [totalItems]="responses.length"
-                        [itemsPerPage]="itemsPerPage"
-                        [currentPage]="currentPage"
-                        (pageChanged)="onPageChange($event)">
-                    </app-pagination>
                 </div>
             </div>
         </div>

@@ -67,8 +67,10 @@ export class AuthService {
       let user: any = null
       if(storageUser) user = JSON.parse(storageUser)
       if(user){
+        console.log('user: ', user)
         this.isValidate(user?.token).subscribe(
           success => {
+            console.log('is validate result: ', success)
             if(success.code === 'jwt_auth_valid_token'){
               this.me(user?.token).subscribe(
                 userUpdate => {
@@ -88,10 +90,12 @@ export class AuthService {
             }
           },
           error => {
+            console.log('is validate error: ', error)
             rejects(false)
           }
         )
       }else{
+        console.log('storage: ', storageUser)
         rejects(false)
       }
     })

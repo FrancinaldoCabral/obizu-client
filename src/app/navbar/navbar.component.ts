@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { NgIf } from '@angular/common';
 import { SocketService } from '../services/socket.service';
+import { QuestionService } from '../services/question.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +16,7 @@ import { SocketService } from '../services/socket.service';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
-  constructor(private auth: AuthService){}
+  constructor(private auth: AuthService, private questionsService: QuestionService){}
 
   logout(): void {
     this.auth.logout()
@@ -35,6 +36,28 @@ export class NavbarComponent {
 
   getUserRole(): string {
     return this.auth.getUser()?.role 
+  }
+
+  backupQuestions(): void {
+    this.questionsService.backup().subscribe(
+      questions => {
+        if(questions.length==0) {
+          alert('Não há questões.')
+          return
+        }
+    
+        const jsonStr = JSON.stringify(questions, null, 2) 
+        const blob = new Blob([jsonStr], { type: 'application/json' })
+        const url = window.URL.createObjectURL(blob)
+    
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'bck-admin-questions.json'
+        a.click()
+    
+        window.URL.revokeObjectURL(url)
+      }
+    )
   }
 
 }

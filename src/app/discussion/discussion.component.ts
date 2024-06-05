@@ -61,7 +61,7 @@ export class DiscussionComponent implements OnInit, OnChanges  {
   }
 
   loadData(): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     const questionId = this.question._id
     this.questionService.getComments(this.currentPage, this.pageSize, questionId).subscribe(
       data => {
@@ -70,26 +70,25 @@ export class DiscussionComponent implements OnInit, OnChanges  {
         this.totalItems = data.totalItems
         console.log(this.totalItems)
         this.totalCommentsEmitter.emit(this.totalItems)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
     })
   }
 
   addComment(): void {
-    this.ngxSpinner.show('transactional')
-    const userDisplayName = this.getUser().user_display_name
-    this.questionService.addComment(this.comment, this.question._id, userDisplayName).subscribe(
+    this.ngxSpinner.show()
+    this.questionService.addComment(this.comment, this.question._id).subscribe(
       data => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadData()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
     })
   }

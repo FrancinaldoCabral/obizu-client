@@ -52,34 +52,34 @@ export class DiscussionAdminComponent implements OnInit {
   }
 
   loadData() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.getCommentsAdmin(this.currentPage, this.pageSize).subscribe(
       data => {
         this.comments = data.items
         this.totalItems = data.totalItems
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
-      ()=> this.ngxSpinner.hide('transactional'))
+      ()=> this.ngxSpinner.hide())
   }
 
   removeComment(_id:any):void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.removeComment(_id).subscribe(
       data => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadData()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
-      ()=> this.ngxSpinner.hide('transactional'))
+      ()=> this.ngxSpinner.hide())
   }
 
   onPageChange(page: number) {

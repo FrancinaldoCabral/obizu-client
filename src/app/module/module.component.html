@@ -6,45 +6,52 @@
         </a>
       </div>
     </div>
-    <div class="row align-items-center g-lg-5 py-5">
+    <div class="row align-items-center g-lg-5 py-5" *ngIf="module">
       <div class="col-lg-7 text-center text-lg-start">
-        <img src="{{module?.imageUrl}}" width="100px" height="100px" class="img-fluid" alt="soldado fuzileiro naval">
-        <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">{{module?.title}}</h1>
-        <p class="col-lg-10 fs-4">{{module?.description}}</p>
+        <img src="{{module?.product.images[0].src}}" width="100px" height="100px" class="img-fluid" alt="soldado fuzileiro naval">
+        <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">{{module?.product.name}}</h1>
+        <span class="col-lg-10 fs-4" [innerHTML]="module?.product.description"></span>
       </div>
       <div class="col-md-10 mx-auto col-lg-5">
-        <form class="p-4 p-md-4 border rounded-3 bg-body-tertiary">
-          <div class="form-floating mb-3">
-            <table class="table mt-2" *ngIf="module?.indices?.length>0">
-                <thead>
-                    <tr>
-                        <th class="text-start">
-                            Índice
-                        </th>
-                        <th class="text-center">
-                            Ação
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let indice of module?.indices">
-                        <td class="text-start">
-                            {{indice.title}}
-                        </td>
-                        <td class="text-end">
-                            <button class="btn btn-outline-success"
-                            [routerLink]="['questions']" [queryParams]="{ filters: indice.filters }"
-                            >
-                              Começar
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-              </table>
-          </div>
-          <hr class="my-4">
-          <small class="text-body-secondary">Clique em começar para iniciar o módulo.</small>
-        </form>
+        <!-- <span class="text-body-secondary" [innerHTML]="module?.product.short_description"></span> -->
+        <table class="table mt-2" *ngIf="module?.indices?.length>0">
+          <thead>
+              <tr>
+                  <th class="text-start">
+                      Índice
+                  </th>
+                  <th class="text-center">
+                      Ação
+                  </th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngFor="let indice of module?.indices">
+                  <td class="text-start">
+                      {{indice.title}}
+                  </td>
+                  <td class="text-end">
+                      <button class="btn btn-outline-primary"
+                      [routerLink]="['questions']" [queryParams]="{ filters: indice.filters }"
+                      >
+                        Começar
+                      </button>
+                  </td>
+              </tr>
+          </tbody>
+        </table>
+        <hr class="my-4">
+        <small class="text-body-secondary">Clique em começar para iniciar o módulo.</small>
+      </div>
+    </div>
+    <div class="row" *ngIf="!module">
+      <div class="col text-center p-4 border">
+        <span>
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div> 
+          <p class="text-body-secondary">Carregando módulo...</p>
+        </span>
       </div>
     </div>
 </div>

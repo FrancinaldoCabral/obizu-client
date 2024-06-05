@@ -12,10 +12,10 @@
     <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
       <div class="feature col shadow-sm pb-4 pt-2" *ngFor="let module of getModules(); let i=index">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-transparent bg-gradient fs-2 mb-3">
-            <img src="{{module.imageUrl}}" alt="Ícone" width="50em" height="50em"/>
+            <img src="{{module.product.images[0].src}}" alt="Ícone" width="50em" height="50em"/>
         </div>          
-        <h5 class="fs-2 text-body-emphasis">{{module.title}}</h5>
-        <p>{{module.description}}</p>  
+        <h5 class="fs-2 text-body-emphasis">{{module.product.name}}</h5>
+        <span [innerHTML]="module.product.description"></span>
         <button class="btn btn-outline-primary btn-sm icon-link"
             routerLink="{{module._id}}"
             [disabled]="module.indices.length===0">

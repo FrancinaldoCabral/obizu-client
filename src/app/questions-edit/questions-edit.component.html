@@ -23,7 +23,7 @@
                     </app-pagination> -->
                 </div>
             </div>
-            <span *ngIf="questions.length==0" class="text-center text-muted mt-4 fw-italic">
+            <span *ngIf="questions.length==0" class="text-center text-body-secondary mt-4 fw-italic">
                 <br><br><br>
                 <div class="alert alert-light" role="alert">
                     <p><em>Crie questões e em seguida salve no banco de dados.</em></p>
@@ -152,7 +152,7 @@ aria-labelledby="editQuestionLabel" aria-hidden="true" data-bs-backdrop="static"
                     <button class="btn btn-primary form-control border-0 mb-2" type="button"
                     (click)="editQuestion.alternatives.push(newAlternative)"
                     id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
-                    <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
+                    <small class="text-body-secondary fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
 
                     
                 </div>

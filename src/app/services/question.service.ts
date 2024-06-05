@@ -158,17 +158,17 @@ export class QuestionService {
     })
   }
 
-  randomQuestions(filters:string[]): Observable<any> {
-    return this.http.post(`${this.env.apiUrl}/api/random`, { filters }, {
+  randomQuestions(filters:string[], moduleId:any): Observable<any> {
+    return this.http.post(`${this.env.apiUrl}/api/random/${moduleId}`, { filters }, {
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`
       })
     })
   }
 
-  respond(questionId:string, response:number): Observable<any> {
+  respond(questionId:string, response:number, moduleId:any): Observable<any> {
     const createdAt = new Date()
-    return this.http.post(`${this.env.apiUrl}/api/respond`, { questionId, response, createdAt }, {
+    return this.http.post(`${this.env.apiUrl}/api/respond`, { questionId, response, createdAt, moduleId }, {
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`
       })
@@ -212,8 +212,8 @@ export class QuestionService {
     })
   }
 
-  addComment(comment:string, questionId:string, userDisplayName:string): Observable<any> {
-    const form = { comment, questionId, userDisplayName, createdAt: new Date() }
+  addComment(comment:string, questionId:string): Observable<any> {
+    const form = { comment, questionId, createdAt: new Date() }
     return this.http.post(`${this.env.apiUrl}/api/discussion`, form, {
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`
@@ -248,6 +248,22 @@ export class QuestionService {
 
   removeComment(_id:any): Observable<any> {
     return this.http.delete(`${this.env.apiUrl}/api/discussion/${_id}`,{
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  getProducts(): Observable<any> {
+    return this.http.get(`${this.env.apiUrl}/api/products`,{
+      headers: new HttpHeaders({
+        'authorization': `Bearer ${this.auth.getToken()}`
+      })
+    })
+  }
+
+  backup(): Observable<any> {
+    return this.http.get(`${this.env.apiUrl}/api/backup/questions`,{
       headers: new HttpHeaders({
         'authorization': `Bearer ${this.auth.getToken()}`
       })

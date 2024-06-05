@@ -175,10 +175,19 @@
   --bs-form-invalid-border-color: #ea868f;
 }
 
+@font-face {
+  font-family: 'Opun-black';
+  src: url('assets/css/fonts/opun-mai-3623601/Opun-Mai-Black.ttf');
+}
+
 .roboto-thin {
   font-family: "Roboto", sans-serif;
   font-weight: 100;
   font-style: normal;
+}
+
+.opun-black {
+  font-family: "Opun-Black";
 }
 
 .roboto-light {

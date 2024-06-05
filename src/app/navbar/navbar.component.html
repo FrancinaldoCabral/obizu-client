@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-lg fixed-top mb-4">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">
+    <a class="navbar-brand opun-black" href="#">
       <img class="img-fluid" width="143px" height="73"
-      src="assets/img/obizu-logotype-rect-fundo-transparente.png" alt="">
+      src="assets/img/logotipo-transparente-recorte.png" alt="">
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -15,11 +15,12 @@
             Admin 
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" routerLink="admin/new">Criar questões</a></li>
-            <li><a class="dropdown-item" routerLink="admin/edit">Editar questões</a></li>
-            <li><a class="dropdown-item" routerLink="admin/modules">Editar módulos</a></li>
-            <li><a class="dropdown-item" routerLink="admin/problems">Problemas sinalizados</a></li>
-            <li><a class="dropdown-item" routerLink="admin/discussion">Comentários</a></li>
+            <li><a class="dropdown-item cursor" routerLink="admin/new">Criar questões</a></li>
+            <li><a class="dropdown-item cursor" routerLink="admin/edit">Editar questões</a></li>
+            <li><a class="dropdown-item cursor" routerLink="admin/modules">Editar módulos</a></li>
+            <li><a class="dropdown-item cursor" routerLink="admin/problems">Problemas sinalizados</a></li>
+            <li><a class="dropdown-item cursor" routerLink="admin/discussion">Comentários</a></li>
+            <li><a class="dropdown-item cursor" (click)="backupQuestions()">Baixar questões</a></li>
           </ul>
         </li>
         <li class="nav-item">
@@ -30,13 +31,13 @@
         </li>
       </ul>
       <form class="d-flex" role="button">
-        <button class="btn btn-outline-danger btn-sm m-1" 
+        <button class="btn btn-outline-warning btn-sm m-1" 
           type="button" *ngIf="isConnected()"
           (click)="logout()">
-            <i class="bi bi-save"></i> Sair
+            Sair
         </button>
-        <button class="btn btn-primary btn-sm m-1" type="button" *ngIf="!isConnected()">
-          <i class="bi bi-save"></i> Entrar
+        <button class="btn btn-outline-primary btn-sm m-1" type="button" *ngIf="!isConnected()">
+           Entrar
         </button>
       </form>
     </div>

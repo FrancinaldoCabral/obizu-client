@@ -6,9 +6,9 @@
                 <tbody>
                     <tr *ngFor="let userComments of comments">
                         <td class="col-10">
-                            <small class="text-muted"><i class="bi bi-person"></i> <i>{{userComments.userDisplayName}}</i></small><br>               
+                            <small class="text-body-secondary"><i class="bi bi-person"></i> <i>{{userComments.userDisplayName}}</i></small><br>               
                             <p class="card-text mb-1">{{userComments.comment}}</p>
-                            <small class="text-muted"><i>{{userComments.createdAt | date:'dd/MM/yyyy HH:mm'}}</i></small>
+                            <small class="text-body-secondary"><i>{{userComments.createdAt | date:'dd/MM/yyyy HH:mm'}}</i></small>
                         </td>
                         <td>
                             <button class="btn btn-outline-light btn-sm m-1" [routerLink]="['/question', userComments.questionId]">Questão</button>
@@ -33,7 +33,7 @@
                     </tr>
                 </tfoot>
             </table>
-            <p class="text-muted" *ngIf="comments.length===0">
+            <p class="text-body-secondary" *ngIf="comments.length===0">
                 <i>Ainda não há comentários.</i>
             </p>
         </div>

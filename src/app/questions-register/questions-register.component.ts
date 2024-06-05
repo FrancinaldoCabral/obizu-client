@@ -115,7 +115,7 @@ export class QuestionsRegisterComponent implements OnInit{
 
         this.saveQuestionsInLocalStorage()
         this.saveCredits()
-        this.loadQuestionsInFailed()
+        //this.loadQuestionsInFailed()
         this.loadCoust()
         this.ngxSpinner.hide('ia-creator')
 
@@ -141,7 +141,7 @@ export class QuestionsRegisterComponent implements OnInit{
 
         this.saveQuestionsInLocalStorage()
         this.saveCredits()
-        this.loadQuestionsInFailed()
+        //this.loadQuestionsInFailed()
         this.loadCoust()
         this.ngxSpinner.hide('ia-creator')
 
@@ -170,7 +170,7 @@ export class QuestionsRegisterComponent implements OnInit{
       }
     )
 
-    this.loadQuestionsInFailed()
+    //this.loadQuestionsInFailed()
     this.loadQuestions()
     this.loadCredits()
     this.loadFormQuestionByText()
@@ -449,7 +449,7 @@ export class QuestionsRegisterComponent implements OnInit{
   }
 
   saveQuestionsInDB(questions: any[]): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     const questionsWithoudIdTemp = questions.map((q:any)=>{
       const { id, ...questionWithoudId } = q
       return questionWithoudId
@@ -457,33 +457,33 @@ export class QuestionsRegisterComponent implements OnInit{
     this.questionService.saveQuestionsInDB(questionsWithoudIdTemp).subscribe(
       (response) => {
         this.toastrService.success('Questões adicionadas no DB')
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       (error) => {
         console.log('save in db error', error)
         this.toastrService.error('Erro no registro de questões.')
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       () => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
   saveOneQuestionInDB(question: any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     const { id, ...questionWithoutId } = question
     this.questionService.saveQuestionsInDB([questionWithoutId]).subscribe(
       (response) => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastrService.success(`1 questão adicionada no DB`)
       },
       (error) => {
         console.log('save in db error', error)
         this.toastrService.error('Erro no registro de questões.')
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       () => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }

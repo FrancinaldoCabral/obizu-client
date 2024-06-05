@@ -12,7 +12,7 @@ export class LoginComponent {
   constructor(private env: EnvironmentService){}
   login(): void {
     //testIChat321 or 1
-    window.location.href = `${this.env.wpUrl}/my-account?login_app=1`
+    window.location.href = `${this.env.wpUrl}/conta?login_app=testIChat321`
   }
   getUrl(): string {
     return this.env.wpUrl

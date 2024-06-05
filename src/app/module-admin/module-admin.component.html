@@ -30,12 +30,13 @@
         <tbody>
             <tr *ngFor="let module of getModules(); let i=index">
                 <td>
-                    <img src="{{module?.imageUrl}}" alt="" class="img-fluid rounded" width="50em" height="50em">
+                    <img src="{{module.product?.images[0]?.src}}" alt="" class="img-fluid rounded" width="50em" height="50em">
                 </td>
                 <td>
-                    <h6>{{module.title}}</h6>
-                    <p>{{module.description}}</p>
-                    <table class="table mt-2" *ngIf="module.indices.length>0">
+                    <h6>{{module.product?.name}}</h6>
+                    <span [innerHTML]="module.product?.description"></span>
+                    <span class="fw-2 text-body-secondary" [innerHTML]="module.product?.short_description"></span>
+                    <table class="table mt-2" *ngIf="module.indices?.length>0">
                         <thead>
                             <tr>
                                 <th class="text-start">
@@ -61,7 +62,7 @@
                     </button><br>
                     <button class="btn btn-outline-success btn-sm m-1" routerLink="{{module._id}}"
                     routerLink="/modules/{{module._id}}"
-                    [disabled]="module.indices.length===0">
+                    [disabled]="module.indices?.length===0">
                         <i class="bi bi-arrow-right-circle-fill ms-1"></i> 
                     </button><br>
                 </td>
@@ -82,40 +83,20 @@
             </div>
             <div class="modal-body">
                 <form>
-                    <div class="m-1">
-                        <label for="inputTitle" class="form-label">Título</label>
-                        <input type="text" id="inputTitle" 
-                        placeholder="Ex.: Soldado Fuzileiro Naval"
-                        class="form-control" aria-describedby="titleHelpBlock" name="title"
-                        [(ngModel)]="newModule.title">
-                        <div id="titleHelpBlock" class="form-text">
-                        Escreva um título para o módulo.
+                    <div class="mt-1">
+                        <label for="productsId" class="form-label">Produtos woocommerce associados</label>
+                        <div class="input-group">
+                            <select class="form-select" id="inputGroupProducts" name="inputGroupProducts"
+                            [(ngModel)]="newModule.productId" 
+                            aria-label="Example select with button addon">
+                              <option *ngFor="let product of products" [value]="product.id">
+                                {{product.name}}
+                              </option>
+                            </select>
                         </div>
                     </div>
-                    <div class="m-1">
-                        <label for="inputDescription" class="form-label">Descrição</label>
-
-                        <textarea id="inputDescription" 
-                        placeholder="Escreva aqui uma descrição."
-                        class="form-control" aria-describedby="descriptionHelpBlock" 
-                        name="inputDescription"
-                        [(ngModel)]="newModule.description"></textarea>
-                        <div id="descriptionHelpBlock" class="form-text">
-                        Escreva uma descrição para o módulo.
-                        </div>
-                    </div>
-                    <div class="m-1">
-                        <label for="inputImageUrl" class="form-label">Imagem</label>
-                        <input type="text" id="inputImageUrl" 
-                        placeholder="Ex.: Soldado Fuzileiro Naval"
-                        class="form-control" aria-describedby="imageUrlHelpBlock" name="imageUrl"
-                        [(ngModel)]="newModule.imageUrl">
-                        <div id="imageUrlHelpBlock" class="form-text">
-                        Uma url de Imagem
-                        </div>
-                    </div>
-
-                    <div class="mt-3">
+                    <hr>
+                    <div class="mt-4">
                         <button class="btn btn-outline-primary btn-sm" type="button" 
                         data-bs-toggle="collapse" 
                         data-bs-target="#newIndice" 
@@ -170,7 +151,7 @@
                                     </button>
                                 </div>
                                 <div class="card-body" *ngIf="filters.length==0">
-                                    <p class="card-text text-muted">Adicione filtros.</p>
+                                    <p class="card-text text-body-secondary">Adicione filtros.</p>
                                 </div>
                             </div>
                         </div>

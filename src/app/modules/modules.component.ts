@@ -50,7 +50,6 @@ export class ModulesComponent {
     this.socketService.getConnecSource$.subscribe(
       (connect:any) => {
           if(connect){
-            this.loadCategories()
             this.loadModules()
           }else{
             this.ngxSpinner.hide()
@@ -61,7 +60,6 @@ export class ModulesComponent {
   
   ngOnInit(): void {
     if(this.socketService.getSocketIsConnect()) {
-      this.loadCategories()
       this.loadModules()
     }
   }
@@ -76,16 +74,16 @@ export class ModulesComponent {
   }
 
   loadCategories() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     const filters = this.filters.map((filter:any)=>{ return filter._id })
     this.questionService.getCategories(filters).subscribe(
       (data:any) => {
         this.categories = data.categories
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       (error:any)=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       })
   }
@@ -104,7 +102,7 @@ export class ModulesComponent {
 
   getModules(): any[]{
     return this.modules.filter((module:any)=>{
-      return module.title.toLowerCase().includes(this.searchModule.toLowerCase())
+      return module.product.name.toLowerCase().includes(this.searchModule.toLowerCase())
     })
   }
 
@@ -121,10 +119,10 @@ export class ModulesComponent {
   }
 
   saveOneModule(newModule: any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.saveModule(newModule).subscribe(
       (response) => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadModules()
         this.toastrService.success(`1 módulo adicionado`)
         this.clearNewModule()
@@ -132,36 +130,36 @@ export class ModulesComponent {
       (error) => {
         console.log('save in db error', error)
         this.toastrService.error('Erro no registro de módulos.')
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       () => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   removeModules(_id:any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.deleteOneModule(_id).subscribe(
       success => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadModules()
         this.toastrService.success(`Questão atualizada com sucesso.`)
       },
       error => {
         this.toastrService.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   updateModule(module: any): void {
     console.log(module)
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.updateOneModule(module).subscribe(
       success => {
         console.log(success)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadModules()
         this.toastrService.success(`Questão atualizada com sucesso.`)
         this.clearNewModule()
@@ -169,22 +167,23 @@ export class ModulesComponent {
       },
       error => {
         this.toastrService.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   loadModules() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.getModules(this.currentPage, this.pageSize).subscribe(
       data => {
         this.modules = data.items
         this.totalItems = data.totalItems
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
+        this.loadCategories()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       })
   }

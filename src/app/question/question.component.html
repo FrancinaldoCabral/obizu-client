@@ -7,7 +7,7 @@
           </a>
         </div>
     </div>
-    <div class="row mb-4">
+    <div class="row mb-4" *ngIf="questions.length>0">
         <div class="col">
             <div class="card animate__animated animate__fadeIn pb-4">
                 <div class="card-header">
@@ -39,6 +39,18 @@
             </div>
         </div>
     </div>
+
+    <div class="row mb-4 justify-content-center" *ngIf="questions.length==0">
+        <div class="col text-center p-4 border">
+            <span>
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div> 
+              <p class="text-body-secondary">Carregando questões...</p>
+            </span>
+        </div>
+    </div>
+
     <br><br>
     <div class="row p-2 mt-4 fixed-bottom justify-content-center align-items-center bg-light">
         <div class="col-12 col-md-8 col-lg-8 text-center">
@@ -47,9 +59,9 @@
                     <div class="btn-group form-control border-0 bg-light" role="group" aria-label="Basic mixed styles example">
                         <button type="button" class="btn btn-light btn-lg"
                         (click)="previous();">
-                            <i class="bi bi-arrow-left-square"></i>
+                            <i class="bi bi-arrow-left"></i>
                         </button>
-                        <button type="button" class="btn btn-success btn-lg"
+                        <button type="button" class="btn btn-primary btn-lg"
                         [disabled]="responses[iQuestions] === null || responses[iQuestions] === undefined || confirmeds[iQuestions]===true"
                         (click)="verify()">
                             <span *ngIf="!verifySpinner">
@@ -63,13 +75,50 @@
                                 Verificar
                             </span>
                         </button>
-                        <button type="button" class="btn btn-light btn-lg"
+                        <button type="button" class="btn btn-light btn-lg" [disabled]="questions.length==0"
                         (click)="next();">
-                            <i class="bi bi-arrow-right-square"></i>
+                            <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Button trigger modal -->
+<button id="btnModalPermission" type="button" style="display: none;" data-bs-toggle="modal" data-bs-target="#modalPermission">
+</button>
+
+<!-- Modal Permission -->
+<div class="modal fade" id="modalPermission" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalPermissionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalPermissionLabel">
+                <i class="bi bi-cart-plus"></i> Assine este módulo.
+            </h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="navigateModule()"></button>
+        </div>
+        <div class="modal-body">
+            <p class="card-text text-danger text-center fs-6 fw-italic">
+                <i class="bi bi-x-circle"></i> Você não tem acesso a este módulo.
+            </p>
+            <div class="feature col shadow-sm p-4">
+                <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-transparent bg-gradient fs-2 mb-3">
+                    <img src="{{module?.product.images[0].src}}" alt="Ícone" width="50em" height="50em"/>
+                </div>          
+                <h5 class="fs-2 text-body-emphasis">{{module?.product.name}}</h5>
+                <!-- <span [innerHTML]="module?.product.description"></span> -->
+                <span class="text-body-secondary" [innerHTML]="module?.product.price_html"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" (click)="navigateModule()">Módulos</button>
+            <button type="button" class="btn btn-outline-primary" (click)="navigateProduct()">
+                <i class="bi bi-cart-plus"></i> Assine agora
+            </button>
+        </div>
         </div>
     </div>
 </div>

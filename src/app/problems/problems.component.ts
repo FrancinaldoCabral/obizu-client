@@ -58,20 +58,20 @@ export class ProblemsComponent implements OnInit {
   }
 
   loadData() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.getProblems(this.currentPage, this.pageSize).subscribe(
       data => {
         this.problems = data.items
         this.questions = data.questions
         this.totalItems = data.totalItems
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
-      ()=> this.ngxSpinner.hide('transactional'))
+      ()=> this.ngxSpinner.hide())
   }
 
   onPageChange(page: number) {
@@ -80,10 +80,10 @@ export class ProblemsComponent implements OnInit {
   }
 
   updateQuestion(question: any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.updateQuestionsInDB([question]).subscribe(
       success => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.editQuestion=null
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
@@ -91,16 +91,16 @@ export class ProblemsComponent implements OnInit {
       },
       error => {
         this.toastr.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   removeQuestion(_id:any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.deleteQuestionsInDB(_id).subscribe(
       success => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.editQuestion=null
         this.loadData()
         this.toastr.success(`Questão removida com sucesso.`)
@@ -108,23 +108,23 @@ export class ProblemsComponent implements OnInit {
       },
       error => {
         this.toastr.error(`Erro na remoção da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   removeProblem(_id:any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.removeProblem(_id).subscribe(
       success => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadData()
         this.toastr.success(`Problema removido com sucesso.`)
         this.editQuestion = null
       },
       error => {
         this.toastr.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }

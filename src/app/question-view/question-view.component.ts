@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { QuestionService } from '../services/question.service';
@@ -21,7 +21,7 @@ import { DiscussionComponent } from '../discussion/discussion.component';
   templateUrl: './question-view.component.html',
   styleUrl: './question-view.component.css'
 })
-export class QuestionViewComponent implements OnInit {
+export class QuestionViewComponent implements OnChanges, OnInit {
   @Input() id!:string
   question: any = {}
   constructor(
@@ -42,23 +42,26 @@ export class QuestionViewComponent implements OnInit {
     )
   }
   ngOnInit(): void {
-    this.loadData()
+    if(this.socketService.getSocketIsConnect()) this.loadData()
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['id']) this.loadData()
   }
 
   loadData(): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.getOneQuestionInDB(this.id).subscribe(
       data => {
         this.question = data
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error => {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastrService.error('Erro no carregamento da questão.')
       },
       () => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }

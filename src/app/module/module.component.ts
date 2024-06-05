@@ -45,15 +45,15 @@ export class ModuleComponent implements OnInit {
   }
 
   loadData() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.getOneModule(this.id).subscribe(
       data => {
         this.module = data
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       })
   }

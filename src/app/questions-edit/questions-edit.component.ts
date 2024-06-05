@@ -76,10 +76,10 @@ export class QuestionsEditComponent implements OnInit {
   }
 
   removeQuestion(_id:any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.deleteQuestionsInDB(_id).subscribe(
       success => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.editQuestion=null
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
@@ -87,16 +87,16 @@ export class QuestionsEditComponent implements OnInit {
       },
       error => {
         this.toastr.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   updateQuestion(question: any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.updateQuestionsInDB([question]).subscribe(
       success => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.editQuestion=null
         this.loadData()
         this.toastr.success(`Questão atualizada com sucesso.`)
@@ -104,25 +104,25 @@ export class QuestionsEditComponent implements OnInit {
       },
       error => {
         this.toastr.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   loadData() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.getQuestionsInDB(this.currentPage, this.pageSize).subscribe(
       data => {
         this.questions = data.items
         this.totalItems = data.totalItems
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         //this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
-      ()=> this.ngxSpinner.hide('transactional'))
+      ()=> this.ngxSpinner.hide())
   }
 
   loadCoust() {
@@ -132,10 +132,10 @@ export class QuestionsEditComponent implements OnInit {
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastr.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
-      ()=> this.ngxSpinner.hide('transactional'))
+      ()=> this.ngxSpinner.hide())
   }
 
   onPageChange(page: number) {

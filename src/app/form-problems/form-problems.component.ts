@@ -27,16 +27,16 @@ export class FormProblemsComponent {
   ){}
   
   addProblem():void{
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     const comment = this.comment
     const questionId = this.questionId
     this.questionService.sinalizeProblem(comment, questionId).subscribe(
       data => {
         this.toastrService.success('Obrigado pelo feedback!')
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastrService.error('Desculpe, houve um problema. Envie um email para suporte@obizu.online')
       }
     )

@@ -4,7 +4,7 @@
             
             <div class="row">
                 <div class="col-6 text-start">
-                    <p class="text-muted mt-4 text-start">Seu custo total com IA: ${{coustTotal | number:'1.2-2'}} dólares</p>
+                    <p class="text-body-secondary mt-4 text-start">Seu custo total com IA: ${{coustTotal | number:'1.2-2'}} dólares</p>
                     <a class="cursor" (click)="toggleSelectAll()">Selecionar tudo ({{selectedItems.size}})</a>
                 </div>
                 <div class="col-6 text-end text-warning" *ngIf="!getSocketIsConnected()">
@@ -15,7 +15,7 @@
                 </div>
             </div> 
 
-            <span *ngIf="questions.length==0" class="text-center text-muted pt-4 fw-italic">
+            <span *ngIf="questions.length==0" class="text-center text-body-secondary pt-4 fw-italic">
                 <br><br><br>
                 <div class="alert alert-light" role="alert">
                     <p><em>Crie questões e em seguida salve no banco de dados.</em></p>
@@ -39,9 +39,9 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item cursor text-danger" [ngClass]="{'disabled': questionsInFailed.length>0}"
-                                    (click)="downloadQuestionsInFailed()">
-                                    Últimas falhas ({{questionsInFailed.length}})
+                                <a class="dropdown-item cursor"
+                                    (click)="openFiles()">
+                                    <i class="bi bi-upload"></i> Fazer upload de questões
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
@@ -317,7 +317,7 @@
                             </div>
                         </div>
                     </div>
-                    <h6>Escreva mais instruções. <small class="text-muted">(opcional)</small></h6>
+                    <h6>Escreva mais instruções. <small class="text-body-secondary">(opcional)</small></h6>
                     <quill-editor class="form-control border-0 mb-2" 
                     (blur)="saveFormReplic()"
                     name="othersInstructions" id="othersInstructions"
@@ -415,7 +415,7 @@
                         <button class="btn btn-primary form-control border-0 mb-2" type="button"
                         (click)="questions[indexEdit].alternatives.push(newAlternative)"
                         id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
-                        <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
+                        <small class="text-body-secondary fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
 
                         
                     </div>
@@ -534,7 +534,7 @@
                         <button class="btn btn-primary form-control border-0 mb-2" type="button"
                         (click)="newQuestion.alternatives.push(newAlternative)"
                         id="btnnewAlternativeInEdit"><i class="bi bi-plus-circle"></i> Adicione o conteúdo acima em uma alterntaiva.</button>                                
-                        <small class="text-muted fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
+                        <small class="text-body-secondary fw-italic">Use texto simples pra melhor usabilidade do usuário.</small>
 
                         
                     </div>

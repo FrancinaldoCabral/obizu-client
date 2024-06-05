@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { QuillModule } from 'ngx-quill';
@@ -22,14 +22,11 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './module-admin.component.html',
   styleUrl: './module-admin.component.css'
 })
-export class ModuleAdminComponent {
+export class ModuleAdminComponent implements OnInit {
   newModule: any = {
-    title: '',
-    description: '',
-    imageUrl: '',
-    indices: [], //
+    indices: [],
+    productId: 0
   }
-
   categories: any[] = []
   filters: any[] = []
   indiceTemp: any[] = []
@@ -38,7 +35,9 @@ export class ModuleAdminComponent {
   pageSize: number = 10
   totalItems: number = 0
   modules: any[] = []
+  products: any[] = []
   searchModule: string = ''
+  productSelected: any
 
   constructor(
     private questionService: QuestionService,
@@ -47,11 +46,13 @@ export class ModuleAdminComponent {
     private toastrService: ToastrService,
     private auth: AuthService
   ){
+    this.clearNewModule()
     this.socketService.getConnecSource$.subscribe(
       (connect:any) => {
           if(connect){
             this.loadCategories()
             this.loadModules()
+            this.loadProducts()
           }else{
             this.ngxSpinner.hide()
           }
@@ -63,33 +64,50 @@ export class ModuleAdminComponent {
     if(this.socketService.getSocketIsConnect()) {
       this.loadCategories()
       this.loadModules()
+      this.loadProducts()
     }
   }
 
   clearNewModule(): void {
     this.newModule = {
-      title: '',
-      description: '',
-      imageUrl: '',
-      indices: [] //
+      indices: [],
+      productId: 0
     }
   }
 
   loadCategories() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     const filters = this.filters.map((filter:any)=>{ return filter._id })
-    this.questionService.getCategories(filters).subscribe(
+    this.questionService.getCategories([]).subscribe(
       (data:any) => {
         this.categories = data.categories
         console.log(data.categories)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       (error:any)=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
-      ()=> this.ngxSpinner.hide('transactional'))
+      ()=> this.ngxSpinner.hide())
+  }
+
+  loadProducts() {
+    this.ngxSpinner.show()
+    const filters = this.filters.map((filter:any)=>{ return filter._id })
+    this.questionService.getProducts().subscribe(
+      (data:any) => {
+        this.products = data.filter((p:any)=>{return p.id!=121})
+        this.productSelected = this.products.filter((p:any)=>{return p.id!=121})[0]
+        console.log(this.products)
+        this.ngxSpinner.hide()
+      },
+      (error:any)=> {
+        console.log(error)
+        this.ngxSpinner.hide()
+        this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
+      },
+      ()=> this.ngxSpinner.hide())
   }
 
   decodificarSequenciasUnicode(texto: string): string {
@@ -106,7 +124,7 @@ export class ModuleAdminComponent {
 
   getModules(): any[]{
     return this.modules.filter((module:any)=>{
-      return module.title.toLowerCase().includes(this.searchModule.toLowerCase())
+      return module.product.name.toLowerCase().includes(this.searchModule.toLowerCase())
     })
   }
 
@@ -123,10 +141,10 @@ export class ModuleAdminComponent {
   }
 
   saveOneModule(newModule: any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.saveModule(newModule).subscribe(
       (response) => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadModules()
         this.toastrService.success(`1 módulo adicionado`)
         this.clearNewModule()
@@ -134,36 +152,36 @@ export class ModuleAdminComponent {
       (error) => {
         console.log('save in db error', error)
         this.toastrService.error('Erro no registro de módulos.')
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       () => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   removeModules(_id:any): void {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.deleteOneModule(_id).subscribe(
       success => {
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadModules()
         this.toastrService.success(`Questão atualizada com sucesso.`)
       },
       error => {
         this.toastrService.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   updateModule(module: any): void {
     console.log(module)
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.updateOneModule(module).subscribe(
       success => {
         console.log(success)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.loadModules()
         this.toastrService.success(`Questão atualizada com sucesso.`)
         this.clearNewModule()
@@ -171,26 +189,26 @@ export class ModuleAdminComponent {
       },
       error => {
         this.toastrService.error(`Erro na atualização da questão.`)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       }
     )
   }
 
   loadModules() {
-    this.ngxSpinner.show('transactional')
+    this.ngxSpinner.show()
     this.questionService.getModules(this.currentPage, this.pageSize).subscribe(
       data => {
         this.modules = data.items
         this.totalItems = data.totalItems
         console.log(this.modules)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
       },
       error=> {
         console.log(error)
-        this.ngxSpinner.hide('transactional')
+        this.ngxSpinner.hide()
         this.toastrService.error(`Erro no carregamento de questões. Erro: ${error.status}`)
       },
-      ()=> this.ngxSpinner.hide('transactional'))
+      ()=> this.ngxSpinner.hide())
   }
 
   editModule(module:any): void {
