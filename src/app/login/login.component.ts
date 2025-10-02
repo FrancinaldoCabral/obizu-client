@@ -11,8 +11,8 @@ import { EnvironmentService } from '../services/environment.service';
 export class LoginComponent {
   constructor(private env: EnvironmentService){}
   login(): void {
-    //testIChat321 or 1
-    window.location.href = `${this.env.wpUrl}/conta?login_app=testIChat321`
+    //testIChat321 or obizu
+    window.location.href = `${this.env.wpUrl}/conta?login_app=obizu`
   }
   getUrl(): string {
     return this.env.wpUrl
