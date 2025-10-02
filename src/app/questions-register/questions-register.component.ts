@@ -30,15 +30,10 @@ import { AuthService } from '../services/auth.service'
 })
 export class QuestionsRegisterComponent implements OnInit{
   models: string [] = [
-    'claude-3-haiku-20240307',
-    'gpt-3.5-turbo-0125',
-    'claude-3-sonnet-20240229',
-    'gpt-4o',
-    'gpt-4-turbo', 
-    'claude-3-opus-20240229'
+    'gpt-5', 'gpt-5-mini', 'gpt-5-nano'
   ]
   disabledModels: string [] = ['claude-3-sonnet-20240229', 'claude-3-haiku-20240307']
-  model: string = 'gpt-4o' || window.localStorage.getItem('model')
+  model: string = window.localStorage.getItem('model') || 'gpt-4o'
   codProva:string = ''
   qtdeQuestions:number = 0
 

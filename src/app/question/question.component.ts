@@ -84,11 +84,10 @@ export class QuestionComponent implements OnInit {
   }
 
   loadModule() {
-    
     this.questionService.getOneModule(this.id).subscribe(
       data => {
         this.module = data
-        
+        console.log(this.module)
       },
       error=> {
         console.log(error)
@@ -169,19 +168,23 @@ export class QuestionComponent implements OnInit {
       data => {
         const userResponses = data.userResponses
         if(userResponses.isCorrect){
-          this.toastrService.success('Consulte solução comentada logo abaixo.', 'Correto', {
+          this.toastrService.success('Volte na questão e consulte a solução comentada, discussões ou relate problemas.', 'Correto', {
             timeOut: 2000,
             positionClass: 'toast-top-center'
           })
           this.verifySuccessAudio.play()
-          console.log(userResponses)
+          setTimeout(() => {
+            this.next()
+          }, 100);
         }else{
-          this.toastrService.error('Consulte solução comentada logo abaixo.', 'Incorreto', {
+          this.toastrService.error('Volte na questão e consulte a solução comentada, discussões ou relate problemas.', 'Incorreto', {
             timeOut: 2000,
             positionClass: 'toast-top-center'
           })
           this.verifyErrorAudio.play()
-          console.log(userResponses)
+          setTimeout(() => {
+            this.next()
+          }, 100);
         }
         this.confirmeds[this.iQuestions]=true
         this.verifySpinner = false
