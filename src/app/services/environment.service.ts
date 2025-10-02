@@ -6,5 +6,5 @@ import { Injectable } from "@angular/core";
 export class EnvironmentService {
     wpUrl:string = 'https://obizu.online'
     //apiUrl:string = 'https://api.obizu.online' 
-    apiUrl:string = 'https://obizu-c95bfa20dc69.herokuapp.com/' 
+    apiUrl:string = 'https://obizu-c95bfa20dc69.herokuapp.com' 
 }
