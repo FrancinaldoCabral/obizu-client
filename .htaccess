@@ -1,0 +1,38 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Handle Angular routes - redirect to index.html if file doesn't exist
+# But exclude existing files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Exclude common file extensions that should be served normally
+RewriteCond %{REQUEST_URI} !\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json|xml|txt|pdf|html|htm)$ [NC]
+
+# Redirect everything else to index.html for Angular routing
+RewriteRule ^ index.html [L]
+
+# Optional: Set cache headers for static assets
+<IfModule mod_headers.c>
+    # Cache HTML files for 1 hour
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires 0
+    </FilesMatch>
+
+    # Cache CSS/JS files for 1 year
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=31536000"
+    </FilesMatch>
+
+    # Cache images for 1 month
+    <FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf|eot)$">
+        Header set Cache-Control "public, max-age=2628000"
+    </FilesMatch>
+</IfModule>
+
+# Optional: Enable gzip compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>

@@ -614,4 +614,24 @@ export class QuestionsRegisterComponent implements OnInit{
   getSocketIsConnected(): boolean {
     return this.socketService.getSocketIsConnect()
   }
+
+  // Método para testar conexão Socket.IO
+  testSocketConnection(): void {
+    console.log('🧪 Testando conexão Socket.IO...')
+    const diagnosis = this.socketService.diagnoseConnection()
+    this.toastrService.info(`Diagnóstico: ${diagnosis.connected ? 'Conectado' : 'Desconectado'}`)
+
+    if (diagnosis.connected) {
+      this.socketService.testConnection()
+    } else {
+      this.socketService.reconnect()
+    }
+  }
+
+  // Método para reconectar Socket.IO
+  reconnectSocket(): void {
+    console.log('🔄 Reconectando Socket.IO...')
+    this.socketService.reconnect()
+    this.toastrService.info('Tentando reconectar...')
+  }
 }

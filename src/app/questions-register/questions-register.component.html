@@ -7,13 +7,32 @@
                     <p class="text-body-secondary mt-4 text-start">Seu custo total com IA: ${{coustTotal | number:'1.2-2'}} dólares</p>
                     <a class="cursor" (click)="toggleSelectAll()">Selecionar tudo ({{selectedItems.size}})</a>
                 </div>
-                <div class="col-6 text-end text-warning" *ngIf="!getSocketIsConnected()">
-                    <div class="spinner-border spinner-border-sm text-secondary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                <div class="col-6 text-end">
+                    <!-- Indicador de conexão Socket.IO -->
+                    <div *ngIf="!getSocketIsConnected()" class="text-warning">
+                        <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        Conectando Socket.IO...
                     </div>
-                    Conectando...
+                    <div *ngIf="getSocketIsConnected()" class="text-success">
+                        <i class="bi bi-wifi"></i>
+                        Socket.IO Conectado
+                    </div>
+
+                    <!-- Botões de diagnóstico -->
+                    <div class="btn-group ms-2" role="group">
+                        <button class="btn btn-outline-info btn-sm" (click)="testSocketConnection()"
+                                title="Testar conexão Socket.IO">
+                            <i class="bi bi-gear"></i> Teste
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" (click)="reconnectSocket()"
+                                title="Reconectar Socket.IO">
+                            <i class="bi bi-arrow-repeat"></i> Reconectar
+                        </button>
+                    </div>
                 </div>
-            </div> 
+            </div>
 
             <span *ngIf="questions.length==0" class="text-center text-body-secondary pt-4 fw-italic">
                 <br><br><br>
